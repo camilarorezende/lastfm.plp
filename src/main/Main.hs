@@ -2,6 +2,8 @@ module Main where
 
 import Funcionalidades.Funcionalidades 
 import Types.Usuario (Usuario(..))
+import Types.Musica
+import Types.Scrobble
 
 main :: IO ()
 main = do
@@ -82,9 +84,13 @@ menuLogado usuario = do
   opcao <- getLine
   case opcao of
     "1" -> do
+      putStrLn "\n=========== SEU PERFIL ============"
       putStrLn ("Nome: " ++ nome usuario)
       putStrLn ("Email: " ++ email usuario)
       putStrLn ("Conquistas: " ++ show (conquistas usuario))
+      scs <- carregarScrobbles         
+      let scrobbles = filter (\s -> email s == email usuario) scs 
+      historicoDoUsuario scrobbles           
       menuLogado usuario
 
     "2" -> do
@@ -92,8 +98,24 @@ menuLogado usuario = do
       menuLogado usuario
 
     "3" -> do
-     
-      menuLogado usuario
+      catalogo <- carregarCatalogo
+      if null catalogo
+        then putStrLn "Nenhuma música disponível no catálogo." >> menuLogado usuario
+        else do
+          putStrLn "\nEscolha uma música para scrobble:"
+          mapM_ (\(i, m) -> putStrLn $ show i ++ " - " ++ titulo m ++ " - " ++ artista m)
+                (zip [1..] catalogo)
+          putStr "Digite o número da música: "
+          hFlush stdout
+          entrada <- getLine
+          case reads entrada of
+            [(n, "")] | n > 0 && n <= length catalogo -> do
+              let musicaEscolhida = catalogo !! (n - 1)
+              registrarScrobble usuario musicaEscolhida
+              menuLogado usuario
+            _ -> do
+              putStrLn "Entrada inválida. Tente novamente."
+              menuLogado usuario
 
     "4" -> do
      

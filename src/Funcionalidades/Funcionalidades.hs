@@ -1,14 +1,37 @@
 module Funcionalidades.Funcionalidades where
 
 import Types.BaseDeDados
+import Types.Musica
+import Types.Scrobble
 import Types.Usuario (Usuario(..))
 import System.IO (hFlush, stdout)
-import Data.Aeson (encodeFile, decodeFileStrict)
+import Data.Aeson (encodeFile, decodeFileStrict, encode)
 import System.Directory (doesFileExist)
+import qualified Data.ByteString.Lazy as B
+import Data.Aeson (decode)
+import Data.Time.Clock (getCurrentTime)
+import Data.Time.Format (formatTime, defaultTimeLocale)
 
+
+scrobbleArquivo :: FilePath
+scrobbleArquivo = "scrobbles.json"
+
+salvarScrobbles :: [Scrobble] -> IO ()
+salvarScrobbles scrobbles = B.writeFile scrobbleArquivo (encode scrobbles)
+
+carregarScrobbles :: IO [Scrobble]
+carregarScrobbles = do
+  existe <- doesFileExist scrobbleArquivo
+  if not existe
+    then return []
+    else do
+      conteudo <- B.readFile scrobbleArquivo
+      case decode conteudo of
+        Just scs -> return scs
+        Nothing  -> return []
 
 usuariosArquivo :: FilePath
-usuariosArquivo = "dados.json"
+usuariosArquivo = "usuarios.json"
 
 salvarUsuarios :: [Usuario] -> IO ()
 salvarUsuarios usuarios = encodeFile usuariosArquivo usuarios
@@ -23,6 +46,18 @@ carregarUsuarios = do
         Just usuarios -> return usuarios
         Nothing -> return []
     else return []
+
+carregarCatalogo :: IO [Musica]
+carregarCatalogo = do
+  let catalogoArquivo = "catalogo.json"
+  existe <- doesFileExist catalogoArquivo
+  if not existe
+    then return []
+    else do
+      mCatalogo <- decodeFileStrict catalogoArquivo
+      case mCatalogo of
+        Just catalogo -> return catalogo
+        Nothing       -> return []
 
 cadastrarUsuario :: Usuario -> [Usuario] -> IO [Usuario]
 cadastrarUsuario novoUsuario usuarios = do
@@ -40,9 +75,25 @@ loginUsuario emailInput senhaInput usuarios = do
     []    -> return Nothing
 
     
---registrarScrobble ::
+registrarScrobble :: Usuario -> Musica -> IO ()
+registrarScrobble usuario musicaEscolhida = do
+  hora <- getCurrentTime
+  let momento = formatTime defaultTimeLocale "%Y-%m-%dT%H:%M:%S%QZ" hora
+      novoScrobble = Scrobble musicaEscolhida (email usuario) momento
 
---mostrarHistorico ::
+  scs <- carregarScrobbles
+  salvarScrobbles (novoScrobble : scs)
+
+  putStrLn "Scrobble registrado com sucesso!"
+
+
+historicoDoUsuario :: [Scrobble] -> IO ()
+historicoDoUsuario scrobbles = 
+  if null scrobbles
+    then putStrLn "\nVocê ainda não tem scrobbles registrados."
+    else do
+      putStrLn "\nSeu histórico de scrobbles:"
+      mapM_ (\s -> putStrLn $ "- " ++ titulo (musica s) ++ " - " ++ artista (musica s) ++ " (" ++ momento s ++ ")") scrobbles
 
 --gerarRankingPessoal ::
 

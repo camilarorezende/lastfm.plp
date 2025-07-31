@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Types.Genero where
 
 import GHC.Generics (Generic)
@@ -7,7 +10,6 @@ data Genero
   = Rock
   | Pop
   | Eletronica
-  | Classico
   | HipHop
   | Rap
   | Funk
@@ -15,6 +17,5 @@ data Genero
   | Sertanejo
   | Forro
   | Indie
-  | Pagode
-  | Reggae
-  deriving (Show, Eq, Enum, Bounded, Generic, ToJSON, FromJSON)
+  | Pagode 
+  deriving (Show, Eq, Enum, Read, Bounded, Generic, ToJSON, FromJSON)

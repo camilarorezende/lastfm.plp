@@ -1,4 +1,7 @@
-Module Types.Scrobble where
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
+module Types.Scrobble where
 
 import Types.Usuario
 import Types.Musica

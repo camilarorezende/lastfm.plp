@@ -1,4 +1,7 @@
-Module Types.Usuario where
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
+module Types.Usuario where
 
 import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)

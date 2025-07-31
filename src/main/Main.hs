@@ -74,8 +74,10 @@ menuLogado usuario = do
   putStrLn "1 - Ver Perfil"
   putStrLn "2 - Ver Conquistas"
   putStrLn "3 - Registrar scrobble"
-  putStrLn "4 - Calcular Compatibilidade"
-  putStrLn "5 - Voltar ao Menu Principal"
+  putStrLn "4 - Ver Ranking Pessoal"
+  putStrLn "5 - Receber Recomendação" 
+  putStrLn "6 - Calcular Compatibilidade"
+  putStrLn "7 - Voltar ao Menu Principal"
   putStrLn "\nEscolha uma opção: "
   opcao <- getLine
   case opcao of
@@ -93,11 +95,19 @@ menuLogado usuario = do
      
       menuLogado usuario
 
-    "4" ->
-
+    "4" -> do
+     
       menuLogado usuario
 
     "5" -> do
+
+      menuLogado usuario
+
+    "6" -> do
+
+      menuLogado usuario
+
+    "7" -> do
       putStrLn "Fazendo logout..."
       usuarios <- carregarUsuarios
       menu usuarios

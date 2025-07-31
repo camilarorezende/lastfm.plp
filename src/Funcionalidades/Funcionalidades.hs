@@ -1,6 +1,5 @@
 module Funcionalidades.Funcionalidades where
 
-import Types.BaseDeDados
 import Types.Musica
 import Types.Scrobble
 import Types.Usuario (Usuario(..))

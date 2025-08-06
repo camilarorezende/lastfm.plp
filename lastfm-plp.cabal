@@ -1,0 +1,38 @@
+cabal-version:      3.0
+name:               lastfm-plp
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            MIT
+license-file:       LICENSE
+author:             lohluna
+maintainer:         --
+-- copyright:
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+common warnings
+    ghc-options: -Wall
+
+executable lastfm-plp
+    import:           warnings
+    main-is:          main/Main.hs
+
+  hs-source-dirs:      src
+  build-depends: base >=4.18.3.0,
+               directory,
+               bytestring,
+               time,
+               aeson,
+               containers
+
+  other-modules:
+    Funcionalidades.Conquistas,
+    Funcionalidades.Funcionalidades,
+    Types.Usuario,
+    Types.Scrobble,
+    Types.Musica,
+    Types.Genero
+  default-language:    GHC2021
+  ghc-options:         -Wall

@@ -3,7 +3,7 @@
 
 module Types.Usuario where
 
-import Types.Scrobble
+import Types.Scrobble ( Scrobble )
 import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)
 
@@ -11,5 +11,6 @@ data Usuario = Usuario {
     nome :: String,
     email :: String,
     senha :: String,
-    conquistas :: [String]
-}  deriving (Show, Eq, Read, Generic, ToJSON, FromJSON)
+    conquistas :: [String],
+    scrobbles :: [Types.Scrobble.Scrobble]
+}  deriving (Show, Eq, Read, Generic, Data.Aeson.ToJSON, Data.Aeson.FromJSON)

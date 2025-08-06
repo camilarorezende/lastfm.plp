@@ -1,5 +1,7 @@
 module Main where
 
+import System.IO (hFlush, stdout)
+import Funcionalidades.Conquistas (verConquistas, calcularConquistas)
 import Funcionalidades.Funcionalidades 
 import Types.Usuario (Usuario(..))
 import Types.Musica
@@ -35,7 +37,7 @@ menu usuarios = do
              putStrLn "\nJá existe um usuário cadastrado com esse email!"
              menu usuarios
            else do
-             let novoUsuario = Usuario nome email senha []
+             let novoUsuario = Usuario nome email senha [] []
              usuariosAtualizados <- cadastrarUsuario novoUsuario usuarios
              putStrLn "\nUsuário cadastrado com sucesso!"
              menu usuariosAtualizados
@@ -67,6 +69,7 @@ menu usuarios = do
          menu usuarios
 
 
+
 menuLogado :: Usuario -> IO ()
 menuLogado usuario = do
   putStrLn "\n================= MENU USUÁRIO LOGADO ================="
@@ -89,13 +92,23 @@ menuLogado usuario = do
       putStrLn ("Email: " ++ email usuario)
       putStrLn ("Conquistas: " ++ show (conquistas usuario))
       scs <- carregarScrobbles         
-      let scrobbles = filter (\s -> email s == email usuario) scs 
+      let scrobbles = filter (\s -> emailUsuario s == email usuario) scs
       historicoDoUsuario scrobbles           
       menuLogado usuario
 
     "2" -> do
-      
-      menuLogado usuario
+         putStrLn "\n===== SUAS CONQUISTAS ====="
+         verConquistas usuario
+         putStrLn "\nCalculando novas conquistas..."
+         let novas = calcularConquistas usuario
+         if null novas
+           then putStrLn "Nenhuma nova conquista disponível no momento."
+           else do
+             putStrLn "Você desbloqueou novas conquistas:"
+             mapM_ (\c -> putStrLn ("- " ++ c)) novas
+         menuLogado usuario
+
+        
 
     "3" -> do
       catalogo <- carregarCatalogo

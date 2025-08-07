@@ -1,22 +1,22 @@
 module Main where
 
 import System.IO (hFlush, stdout)
-<<<<<<< HEAD
-import Funcionalidades.Conquistas (verConquistas, calcularConquistas)
+import Funcionalidades.Conquistas (calcularConquistas, getConquistasUsuario)
 import Funcionalidades.Funcionalidades 
-=======
-import Funcionalidades.Funcionalidades (verConquistas,
-    carregarUsuarios
+  ( carregarUsuarios
   , cadastrarUsuario
   , loginUsuario
   , carregarScrobbles
   , historicoDoUsuario
   , carregarCatalogo
-  , registrarScrobble)
->>>>>>> f3cc254 (Salvando minhas alterações antes de mudar de branch)
+  , registrarScrobble
+  , verConquistas
+  )
+
 import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
+
 
 main :: IO ()
 main = do
@@ -108,27 +108,20 @@ menuLogado usuario = do
       menuLogado usuario
 
     "2" -> do
-<<<<<<< HEAD
-         putStrLn "\n===== SUAS CONQUISTAS ====="
-         verConquistas usuario
-         putStrLn "\nCalculando novas conquistas..."
-         let novas = calcularConquistas usuario
-         if null novas
-           then putStrLn "Nenhuma nova conquista disponível no momento."
-           else do
-             putStrLn "Você desbloqueou novas conquistas:"
-             mapM_ (\c -> putStrLn ("- " ++ c)) novas
-         menuLogado usuario
+        putStrLn "\n===== SUAS CONQUISTAS ====="
+        scs <- carregarScrobbles
+        let scrobblesUsuario = filter (\s -> emailUsuario s == email usuario) scs
+        verConquistas usuario scrobblesUsuario
+        putStrLn "\nCalculando novas conquistas..."
+        let novas = getConquistasUsuario usuario scrobblesUsuario
+        if null novas
+          then putStrLn "Nenhuma nova conquista disponível no momento."
+          else do
+            putStrLn "Você desbloqueou novas conquistas:"
+            mapM_ (\c -> putStrLn ("- " ++ c)) novas
+        menuLogado usuario
 
         
-=======
-      scs <- carregarScrobbles
-      let scrobblesUsuario = filter (\s -> emailUsuario s == email usuario) scs
-      verConquistas usuario scrobblesUsuario
-      menuLogado usuario
->>>>>>> f3cc254 (Salvando minhas alterações antes de mudar de branch)
-
-
 
     "3" -> do
       catalogo <- carregarCatalogo
@@ -144,8 +137,12 @@ menuLogado usuario = do
           case reads entrada of
             [(n, "")] | n > 0 && n <= length catalogo -> do
               let musicaEscolhida = catalogo !! (n - 1)
-              usuarioAtualizado <- registrarScrobble usuario musicaEscolhida
-              menuLogado usuarioAtualizado  
+              registrarScrobble usuario musicaEscolhida
+              menuLogado usuario
+            _ -> do
+              putStrLn "Entrada inválida. Tente novamente."
+              menuLogado usuario
+
     "4" -> do
      
       menuLogado usuario

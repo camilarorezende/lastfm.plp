@@ -1,4 +1,13 @@
-module Funcionalidades.Funcionalidades where
+module Funcionalidades.Funcionalidades
+  ( carregarUsuarios
+  , cadastrarUsuario
+  , loginUsuario
+  , carregarScrobbles
+  , historicoDoUsuario
+  , carregarCatalogo
+  , registrarScrobble
+  , verConquistas
+  ) where
 
 import Funcionalidades.Conquistas (getConquistasUsuario, conquistasDisponiveis)
 import Types.Usuario (Usuario(..))

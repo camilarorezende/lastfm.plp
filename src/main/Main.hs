@@ -1,3 +1,5 @@
+{-# LANGUAGE BlockArguments #-}
+
 module Main where
 
 import Funcionalidades.Funcionalidades 
@@ -20,53 +22,59 @@ menu usuarios = do
     putStrLn "2 - Fazer Login"
     putStrLn "3 - Ver Ranking Global"
     putStrLn "4 - Sair"
-    putStrLn "\nEscolha uma opçâo: "
+    putStrLn "\nEscolha uma opção: "
     opcao <- getLine 
     case opcao of
       "1" -> do
-         putStrLn "\nDigite seu Nome: "
-         nome <- getLine
-         putStrLn "Digite seu Email: "
-         email <- getLine
-         putStrLn "Digite sua Senha: "
-         senha <- getLine
+        putStrLn "\nDigite seu Nome: "
+        nome <- getLine
+        putStrLn "Digite seu Email: "
+        email <- getLine
+        putStrLn "Digite sua Senha: "
+        senha <- getLine
 
-         let existeEmail = any (\u -> email == Types.Usuario.email u) usuarios
-         if existeEmail
-           then do
-             putStrLn "\nJá existe um usuário cadastrado com esse email!"
-             menu usuarios
-           else do
-             let novoUsuario = Usuario nome email senha []
-             usuariosAtualizados <- cadastrarUsuario novoUsuario usuarios
-             putStrLn "\nUsuário cadastrado com sucesso!"
-             menu usuariosAtualizados
+        if not (validaNome nome)
+          then do
+            putStrLn "\nNome inválido! Use apenas letras e espaços."
+            menu usuarios
+          else if not (validaEmail email)
+            then do
+              putStrLn "\nEmail inválido! Insira um email válido."
+              menu usuarios
+            else if any (\u -> email == Types.Usuario.email u) usuarios
+              then do
+                putStrLn "\nJá existe um usuário cadastrado com esse email!"
+                menu usuarios
+              else do
+                let novoUsuario = Usuario nome email senha []
+                usuariosAtualizados <- cadastrarUsuario novoUsuario usuarios
+                putStrLn "\nUsuário cadastrado com sucesso!"
+                menu usuariosAtualizados
 
       "2" -> do
-         putStrLn "\nDigite seu Email: "
-         email <- getLine
-         putStrLn "Digite sua Senha: "
-         senha <- getLine
-         resultado <- loginUsuario email senha usuarios
-         case resultado of
-            Just usuario -> do
-               putStrLn ("\nBem-vindo(a) de volta, " ++ nome usuario ++ "!")    
-               menuLogado usuario
-
-            Nothing -> do
-               putStrLn "\nEmail ou senha incorretos. Tente novamente."
-               menu usuarios
+        putStrLn "\nDigite seu Email: "
+        email <- getLine
+        putStrLn "Digite sua Senha: "
+        senha <- getLine
+        resultado <- loginUsuario email senha usuarios
+        case resultado of
+          Just usuario -> do
+            putStrLn ("\nBem-vindo(a) de volta, " ++ nome usuario ++ "!")
+            menuLogado usuario
+          Nothing -> do
+            putStrLn "\nEmail ou senha incorretos. Tente novamente."
+            menu usuarios
 
       "3" -> do
-         menu usuarios
-        
+        menu usuarios
+
       "4" -> do
-         putStrLn "Encerrando o programa. Até logo!"
-         return ()
+        putStrLn "Encerrando o programa. Até logo!"
+        return ()
 
       _ -> do
-         putStrLn "\nOpção inválida! Tente novamente."
-         menu usuarios
+        putStrLn "\nOpção inválida! Tente novamente."
+        menu usuarios
 
 
 menuLogado :: Usuario -> IO ()
@@ -89,7 +97,6 @@ menuLogado usuario = do
       putStrLn "\n=========== SEU PERFIL ============"
       putStrLn ("Nome: " ++ nome usuario)
       putStrLn ("Email: " ++ email usuario)
-      putStrLn ("Conquistas: " ++ show (conquistas usuario))
       scs <- carregarScrobbles         
       let scrobbles = filter (\s -> emailUsuario s == email usuario) scs
       historicoDoUsuario scrobbles           

@@ -10,6 +10,7 @@ import qualified Data.ByteString.Lazy as B
 import Data.Aeson (decode)
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Format (formatTime, defaultTimeLocale)
+import Data.Char (isLetter, isSpace)
 
 
 scrobbleArquivo :: FilePath
@@ -58,12 +59,27 @@ carregarCatalogo = do
         Just catalogo -> return catalogo
         Nothing       -> return []
 
+validaNome :: String -> Bool
+validaNome nome = 
+  not (null nome) && all (\c -> isLetter c || isSpace c) nome
+
+validaEmail :: String -> Bool
+validaEmail email = 
+  let parts = splitOn '@' email
+  in length parts == 2 && not (null (head parts)) && '.' `elem` (parts !! 1)
+     && all (/= ' ') email
+  where
+    splitOn c s = case break (== c) s of
+      (x, []) -> [x]
+      (x, _:rest) -> x : splitOn c rest
+
 cadastrarUsuario :: Usuario -> [Usuario] -> IO [Usuario]
 cadastrarUsuario novoUsuario usuarios = do
   let usuarioComConquistas = novoUsuario { conquistas = [] }
       usuariosAtualizados = usuarioComConquistas : usuarios
   salvarUsuarios usuariosAtualizados
   return usuariosAtualizados
+
 
 loginUsuario :: String -> String -> [Usuario] -> IO (Maybe Usuario)
 loginUsuario emailInput senhaInput usuarios = do

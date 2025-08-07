@@ -1,12 +1,14 @@
-Module Types.Scrobble where
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
-import Types.Usuario
+module Types.Scrobble where
+
 import Types.Musica
 import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)
 
 data Scrobble = Scrobble {
     musica :: Musica,
-    usuario :: Usuario,
+    emailUsuario :: String,
     momento :: String --timestamp
 }  deriving (Show, Eq, Read, Generic, ToJSON, FromJSON)

@@ -1,17 +1,12 @@
-<<<<<<< Updated upstream
-main :: IO()
-main = do
-    
-=======
+
 module Main where
 
-import System.IO (hFlush, stdout)
-import Funcionalidades.Conquistas (verConquistas, calcularConquistas)
-import Funcionalidades.Funcionalidades (gerarRankingPessoal, gerarRankingGlobal, carregarUsuarios, carregarScrobbles, registrarScrobble, carregarCatalogo)
 import Funcionalidades.Funcionalidades 
 import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
+import System.IO (hFlush, stdout)
+
 
 main :: IO ()
 main = do
@@ -43,7 +38,7 @@ menu usuarios = do
              putStrLn "\nJá existe um usuário cadastrado com esse email!"
              menu usuarios
            else do
-             let novoUsuario = Usuario nome email senha [] []
+             let novoUsuario = Usuario nome email senha [] 
              usuariosAtualizados <- cadastrarUsuario novoUsuario usuarios
              putStrLn "\nUsuário cadastrado com sucesso!"
              menu usuariosAtualizados
@@ -149,4 +144,4 @@ menuLogado usuario = do
     _ -> do
       putStrLn "Opção inválida! Tente novamente."
       menuLogado usuario
->>>>>>> Stashed changes
+

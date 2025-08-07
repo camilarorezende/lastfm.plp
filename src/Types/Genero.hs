@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Types.Genero where
 
 import GHC.Generics (Generic)
@@ -15,11 +18,6 @@ data Genero
   | Sertanejo
   | Forro
   | Indie
-<<<<<<< Updated upstream
   | Pagode
   | Reggae
-  deriving (Show, Eq, Enum, Bounded, Generic, ToJSON, FromJSON)
-=======
-  | Pagode 
-  deriving (Show, Eq, Enum, Read, Bounded, Generic, ToJSON, FromJSON)
->>>>>>> Stashed changes
+  deriving (Show, Read, Eq, Enum, Bounded, Generic, ToJSON, FromJSON)

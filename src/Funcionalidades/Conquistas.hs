@@ -1,4 +1,4 @@
-module Conquistas (
+module Funcionalidades.Conquistas (
   conquistasDisponiveis,
   getConquistasUsuario  
 ) where
@@ -13,4 +13,5 @@ conquistasDisponiveis =
        "100 minutos escutados"  
     ]
 
-getConquistasUsuario ::
+getConquistasUsuario :: Usuario -> [String]
+getConquistasUsuario _ = []

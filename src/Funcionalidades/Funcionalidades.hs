@@ -1,37 +1,18 @@
-module Funcionalidades where
+module Funcionalidades.Funcionalidades where
 
-import Types.BaseDeDados
-import Types.Usuario
+import Types.Musica
+import Types.Scrobble
+import Types.Usuario (Usuario(..))
 import System.IO (hFlush, stdout)
-<<<<<<< Updated upstream
-
-cadastrarUusario ::
-
-loginUsuario ::
-
-registrarScrobble ::
-
-mostrarHistorico ::
-
-gerarRankingPessoal ::
-
-gerarRankingGlobal ::
-
-verConquistas ::
-
-recomendarMusicas ::
-
-verificarCompatibilidade ::
-=======
 import Data.Aeson (encodeFile, decodeFileStrict, encode)
-import Data.List (groupBy, sortBy)
-import Data.Function (on)
-import Data.Ord (comparing)
 import System.Directory (doesFileExist)
 import qualified Data.ByteString.Lazy as B
 import Data.Aeson (decode)
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Format (formatTime, defaultTimeLocale)
+import Data.List (groupBy, sortBy)
+import Data.Function (on)
+import Data.Ord (comparing)
 
 
 scrobbleArquivo :: FilePath
@@ -122,7 +103,7 @@ gerarRankingPessoal usuario = do
   let scrobblesUsuario = filter (\s -> emailUsuario s == email usuario) scs
   if null scrobblesUsuario
     then putStrLn "Você ainda não tem scrobbles registrados."
-    else dos
+    else do
       let musicas = map musica scrobblesUsuario
           agrupadas = groupBy ((==) `on` titulo) $ sortBy (comparing titulo) musicas
           contagens = map (\grp -> (head grp, length grp)) agrupadas
@@ -147,6 +128,6 @@ gerarRankingGlobal = do
 --recomendarMusicas ::
 
 --verificarCompatibilidade ::
->>>>>>> Stashed changes
+
 
 

@@ -1,4 +1,7 @@
-Module Types.Musica where
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
+module Types.Musica where
 
 import Types.Genero
 import GHC.Generics (Generic)
@@ -11,6 +14,3 @@ data Musica = Musica {
     genero :: Genero,
     duracao :: Int
 } deriving (Show, Eq, Read, Generic, ToJSON, FromJSON)
-
-instance FromJSON Musica
-instance ToJSON Musica

@@ -4,6 +4,8 @@ import Funcionalidades.Funcionalidades
 import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
+import System.IO (hFlush, stdout)
+
 
 main :: IO ()
 main = do
@@ -89,7 +91,7 @@ menuLogado usuario = do
       putStrLn ("Email: " ++ email usuario)
       putStrLn ("Conquistas: " ++ show (conquistas usuario))
       scs <- carregarScrobbles         
-      let scrobbles = filter (\s -> email s == email usuario) scs 
+      let scrobbles = filter (\s -> emailUsuario s == email usuario) scs
       historicoDoUsuario scrobbles           
       menuLogado usuario
 
@@ -105,7 +107,7 @@ menuLogado usuario = do
           putStrLn "\nEscolha uma música para scrobble:"
           mapM_ (\(i, m) -> putStrLn $ show i ++ " - " ++ titulo m ++ " - " ++ artista m)
                 (zip [1..] catalogo)
-          putStr "Digite o número da música: "
+          putStr "\nDigite o número da música: "
           hFlush stdout
           entrada <- getLine
           case reads entrada of

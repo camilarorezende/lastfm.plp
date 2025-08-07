@@ -77,7 +77,7 @@ loginUsuario emailInput senhaInput usuarios = do
 registrarScrobble :: Usuario -> Musica -> IO ()
 registrarScrobble usuario musicaEscolhida = do
   hora <- getCurrentTime
-  let momento = formatTime defaultTimeLocale "%Y-%m-%dT%H:%M:%S%QZ" hora
+  let momento = formatTime defaultTimeLocale "%d/%m/%Y %H:%M" hora
       novoScrobble = Scrobble musicaEscolhida (email usuario) momento
 
   scs <- carregarScrobbles

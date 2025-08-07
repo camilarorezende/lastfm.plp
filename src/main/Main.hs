@@ -1,8 +1,19 @@
 module Main where
 
 import System.IO (hFlush, stdout)
+<<<<<<< HEAD
 import Funcionalidades.Conquistas (verConquistas, calcularConquistas)
 import Funcionalidades.Funcionalidades 
+=======
+import Funcionalidades.Funcionalidades (verConquistas,
+    carregarUsuarios
+  , cadastrarUsuario
+  , loginUsuario
+  , carregarScrobbles
+  , historicoDoUsuario
+  , carregarCatalogo
+  , registrarScrobble)
+>>>>>>> f3cc254 (Salvando minhas alterações antes de mudar de branch)
 import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
@@ -97,6 +108,7 @@ menuLogado usuario = do
       menuLogado usuario
 
     "2" -> do
+<<<<<<< HEAD
          putStrLn "\n===== SUAS CONQUISTAS ====="
          verConquistas usuario
          putStrLn "\nCalculando novas conquistas..."
@@ -109,6 +121,14 @@ menuLogado usuario = do
          menuLogado usuario
 
         
+=======
+      scs <- carregarScrobbles
+      let scrobblesUsuario = filter (\s -> emailUsuario s == email usuario) scs
+      verConquistas usuario scrobblesUsuario
+      menuLogado usuario
+>>>>>>> f3cc254 (Salvando minhas alterações antes de mudar de branch)
+
+
 
     "3" -> do
       catalogo <- carregarCatalogo
@@ -124,12 +144,8 @@ menuLogado usuario = do
           case reads entrada of
             [(n, "")] | n > 0 && n <= length catalogo -> do
               let musicaEscolhida = catalogo !! (n - 1)
-              registrarScrobble usuario musicaEscolhida
-              menuLogado usuario
-            _ -> do
-              putStrLn "Entrada inválida. Tente novamente."
-              menuLogado usuario
-
+              usuarioAtualizado <- registrarScrobble usuario musicaEscolhida
+              menuLogado usuarioAtualizado  
     "4" -> do
      
       menuLogado usuario

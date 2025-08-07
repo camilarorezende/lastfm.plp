@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 [{"conquistas":[],"email":"lorena@email.com","nome":"Lorena","scrobbles":[],"senha":"lorena"}]
+=======
+[{"conquistas":[],"email":"aaa","nome":"teste","senha":"aaa"},{"conquistas":["Primeiro Scrobble!"],"email":"teste","nome":"teste","senha":"teste"},{"conquistas":["Primeiro Scrobble!","100 minutos escutados"],"email":"lore","nome":"lore","senha":"lore"},{"conquistas":[],"email":"lorena","nome":"lorena","senha":"lorena"}]
+>>>>>>> f3cc254 (Salvando minhas alterações antes de mudar de branch)

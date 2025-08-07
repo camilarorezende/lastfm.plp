@@ -1,5 +1,7 @@
 module Funcionalidades.Funcionalidades where
 
+import Funcionalidades.Conquistas (getConquistasUsuario, conquistasDisponiveis)
+import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
 import Types.Usuario (Usuario(..))
@@ -74,16 +76,30 @@ loginUsuario emailInput senhaInput usuarios = do
     []    -> return Nothing
 
     
-registrarScrobble :: Usuario -> Musica -> IO ()
+registrarScrobble :: Usuario -> Musica -> IO Usuario
 registrarScrobble usuario musicaEscolhida = do
   hora <- getCurrentTime
   let momento = formatTime defaultTimeLocale "%Y-%m-%dT%H:%M:%S%QZ" hora
       novoScrobble = Scrobble musicaEscolhida (email usuario) momento
 
   scs <- carregarScrobbles
-  salvarScrobbles (novoScrobble : scs)
+  let novosScrobbles = novoScrobble : scs
+  salvarScrobbles novosScrobbles
 
-  putStrLn "Scrobble registrado com sucesso!"
+  let conquistasAntes = conquistas usuario
+      conquistasDepois = getConquistasUsuario usuario novosScrobbles
+      novasConquistas = filter (`notElem` conquistasAntes) conquistasDepois
+
+  if null novasConquistas
+    then putStrLn "Scrobble registrado com sucesso!"
+    else do
+      putStrLn "Scrobble registrado com sucesso!"
+      putStrLn "Parabéns! Você desbloqueou as seguintes conquistas:"
+      mapM_ (\c -> putStrLn ("- " ++ c)) novasConquistas
+
+  let usuarioAtualizado = usuario { conquistas = conquistasDepois }
+  return usuarioAtualizado
+
 
 
 historicoDoUsuario :: [Scrobble] -> IO ()
@@ -98,7 +114,14 @@ historicoDoUsuario scrobbles =
 
 --gerarRankingGlobal ::
 
---verConquistas ::
+verConquistas :: Usuario -> [Scrobble] -> IO ()
+verConquistas usuario scrobbles = do
+  let conquistasUsuario = getConquistasUsuario usuario scrobbles
+  if null conquistasUsuario
+    then putStrLn "\nVocê ainda não desbloqueou nenhuma conquista."
+    else do
+      putStrLn "\nConquistas desbloqueadas:"
+      mapM_ (\c -> putStrLn ("- " ++ c)) conquistasUsuario
 
 --recomendarMusicas ::
 

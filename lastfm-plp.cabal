@@ -66,7 +66,8 @@ executable lastfm-plp
         Types.Genero,
         Types.Musica,
         Types.Scrobble,
-        Types.Usuario
+        Types.Usuario,
+        Funcionalidades.Conquistas
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -77,6 +78,7 @@ executable lastfm-plp
                     , bytestring
                     , time
                     , aeson
+                    , random-shuffle
 
     -- Directories containing source files.
     hs-source-dirs:   src src/main

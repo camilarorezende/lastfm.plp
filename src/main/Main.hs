@@ -7,7 +7,8 @@ import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
 import System.IO (hFlush, stdout)
-
+import Funcionalidades.Conquistas (getConquistasUsuario)
+import Data.List (find)
 
 main :: IO ()
 main = do
@@ -66,6 +67,7 @@ menu usuarios = do
             menu usuarios
 
       "3" -> do
+        gerarRankingGlobal
         menu usuarios
 
       "4" -> do
@@ -103,7 +105,8 @@ menuLogado usuario = do
       menuLogado usuario
 
     "2" -> do
-      
+      putStrLn "\n========= SUAS CONQUISTAS ========="
+      verConquistas usuario
       menuLogado usuario
 
     "3" -> do
@@ -112,7 +115,7 @@ menuLogado usuario = do
         then putStrLn "Nenhuma música disponível no catálogo." >> menuLogado usuario
         else do
           putStrLn "\nEscolha uma música para scrobble:"
-          mapM_ (\(i, m) -> putStrLn $ show i ++ " - " ++ titulo m ++ " - " ++ artista m)
+          mapM_ (\(i, m) -> putStrLn $ show i ++ " - " ++ titulo m ++ " - " ++ artista m ++ " - " ++ album m)
                 (zip [1..] catalogo)
           putStr "\nDigite o número da música: "
           hFlush stdout
@@ -120,22 +123,62 @@ menuLogado usuario = do
           case reads entrada of
             [(n, "")] | n > 0 && n <= length catalogo -> do
               let musicaEscolhida = catalogo !! (n - 1)
-              registrarScrobble usuario musicaEscolhida
-              menuLogado usuario
+              usuarioAtualizado <- registrarScrobble usuario musicaEscolhida
+              menuLogado usuarioAtualizado
+
             _ -> do
               putStrLn "Entrada inválida. Tente novamente."
               menuLogado usuario
 
-    "4" -> do
-     
+    "4" -> do    
+      gerarRankingPessoal usuario
       menuLogado usuario
 
     "5" -> do
+      putStrLn $ "\nEscolha o tipo de recomendação:\n" ++
+       "1 - Por gênero\n" ++
+       "2 - Por artista\n" ++
+       "3 - Baseada no histórico\n" ++
+       "\n" ++
+       "\nEscolha uma opção:  "
+      tipoStr <- getLine
+      case reads tipoStr of 
+        [(tipo, "")] | tipo `elem` [1,2,3] -> do
+          parametro <- case tipo of
+            1 -> do
+              putStrLn "\nDigite o gênero:"
+              getLine
+            2 -> do
+              putStrLn "\nDigite o nome do artista:"
+              getLine
+            3 -> return ""
+            _ -> return ""
 
+          musicas <- recomendarMusicas usuario tipo parametro
+          if null musicas
+            then putStrLn "Nenhuma recomendação encontrada."
+            else do
+              putStrLn "\n===== Essas soam que nem você ====="
+              mapM_ (\m -> putStrLn $ "- " ++ titulo m ++ " - " ++ artista m ++ " (" ++ show (genero m) ++ ")") musicas
+        _ -> putStrLn "Opção inválida!"
       menuLogado usuario
 
     "6" -> do
+      putStrLn "\nDigite o email do usuário para match: "
+      emailOutro <- getLine
+      usuarios <- carregarUsuarios
+      case find (\u -> email u == emailOutro) usuarios of
+        Just outro -> do 
+          scrobbles <- carregarScrobbles
+          let compatibilidade = round((verificarCompatibilidade usuario outro scrobbles) * 100) :: Int
 
+          putStrLn $ "\n Seu match com " ++ nome outro ++ " é de: >>>  " ++ show compatibilidade ++"%  <<<"
+          if compatibilidade >= 80 then putStrLn "\n Que match hein!? Ótimo para montarem uma playlist compartilhada!"
+            else if compatibilidade <= 50 then putStrLn "\n Xiii... talvez vocês devam descobrir algo em comum."
+            else putStrLn "\n Nada mau! Vejo bons interesses em comum!"
+
+        Nothing -> putStrLn "\n Usuário não encontrado! Tente novamente"
+ 
       menuLogado usuario
 
     "7" -> do

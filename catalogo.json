@@ -5,6 +5,71 @@
     "album": "Infiel",
     "genero": "Sertanejo",
     "duracao": 120
+},
+
+{
+    "titulo": "I <3 you",
+    "artista": "Marina",
+    "album": "sla",
+    "genero": "Pop",
+    "duracao": 360
+},
+
+ {
+    "titulo": "Beautiful Boy",
+    "artista": "John Lennon",
+    "album": "n sie",
+    "genero": "Rock",
+    "duracao": 150
+},
+
+ {
+    "titulo": "Fine Line",
+    "artista": "Harry Styles",
+    "album": "Fine Line",
+    "genero": "Pop",
+    "duracao": 540
+},
+
+ {
+    "titulo": "Change your ticket",
+    "artista": "One Direction",
+    "album": "FOUR",
+    "genero": "Pop",
+    "duracao": 240
+},
+
+ {
+    "titulo": "Kiss you",
+    "artista": "One Direction",
+    "album": "Take Me Home",
+    "genero": "Pop",
+    "duracao": 120
+},
+
+ {
+    "titulo": "Hey Angel",
+    "artista": "One Direction",
+    "album": "Made in the A.M",
+    "genero": "Pop",
+    "duracao": 120
+},
+
+ {
+    "titulo": "Lover boy",
+    "artista": "Queen",
+    "album": "esqueci",
+    "genero": "Rock",
+    "duracao": 120
+},
+
+ {
+    "titulo": "It's a hard life",
+    "artista": "Queen",
+    "album": "Greatest hits II",
+    "genero": "Rock",
+    "duracao": 120
 }
+
 
 ]

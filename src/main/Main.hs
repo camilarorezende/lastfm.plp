@@ -7,6 +7,7 @@ import Types.Usuario (Usuario(..))
 import Types.Musica
 import Types.Scrobble
 import System.IO (hFlush, stdout)
+import Data.List (find)
 
 
 main :: IO ()
@@ -131,11 +132,50 @@ menuLogado usuario = do
       menuLogado usuario
 
     "5" -> do
+      putStrLn $ "\nEscolha o tipo de recomendação:\n" ++
+       "1 - Por gênero\n" ++
+       "2 - Por artista\n" ++
+       "3 - Baseada no histórico\n" ++
+       "\n" ++
+       "\nEscolha uma opção:  "
+      tipoStr <- getLine
+      case reads tipoStr of 
+        [(tipo, "")] | tipo `elem` [1,2,3] -> do
+          parametro <- case tipo of
+            1 -> do
+              putStrLn "\nDigite o gênero:"
+              getLine
+            2 -> do
+              putStrLn "\nDigite o nome do artista:"
+              getLine
+            3 -> return ""
+            _ -> return ""
 
+          musicas <- recomendarMusicas usuario tipo parametro
+          if null musicas
+            then putStrLn "Nenhuma recomendação encontrada."
+            else do
+              putStrLn "\n=== Essas soam que nem você ==="
+              mapM_ (\m -> putStrLn $ "- " ++ titulo m ++ " - " ++ artista m ++ " (" ++ show (genero m) ++ ")") musicas
+        _ -> putStrLn "Opção inválida!"
       menuLogado usuario
 
     "6" -> do
+      putStrLn "\nDigite o email do usuário para match: "
+      emailOutro <- getLine
+      usuarios <- carregarUsuarios
+      case find (\u -> email u == emailOutro) usuarios of
+        Just outro -> do 
+          scrobbles <- carregarScrobbles
+          let compatibilidade = round((verificarCompatibilidade usuario outro scrobbles) * 100) :: Int
 
+          putStrLn $ "\n Seu match com " ++ nome outro ++ " é de: >>>  " ++ show compatibilidade ++"%  <<<"
+          if compatibilidade >= 80 then putStrLn "\n Que match hein!? Ótimo para montarem uma playlist compartilhada!"
+            else if compatibilidade <= 50 then putStrLn "\n Xiii... talvez devam devam descobrir algo em comum."
+            else putStrLn "\n Nada mau! Vejo bons interesses em comum!"
+
+        Nothing -> putStrLn "\n Usuário não encontrado! Tente novamente"
+ 
       menuLogado usuario
 
     "7" -> do

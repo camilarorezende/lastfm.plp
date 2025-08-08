@@ -18,4 +18,4 @@ data Genero
   | Forro
   | Indie
   | Pagode 
-  deriving (Show, Eq, Enum, Read, Bounded, Generic, ToJSON, FromJSON)
+  deriving (Show, Eq, Enum, Read, Bounded, Generic, ToJSON, FromJSON, Ord)

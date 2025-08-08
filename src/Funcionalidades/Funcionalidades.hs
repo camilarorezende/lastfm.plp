@@ -13,6 +13,7 @@ import Data.Time.Format (formatTime, defaultTimeLocale)
 import Data.List (groupBy, sortBy)
 import Data.Function (on)
 import Data.Ord (comparing)
+import GHC.Base (VecElem(Int16ElemRep))
 
 
 scrobbleArquivo :: FilePath
@@ -99,30 +100,78 @@ historicoDoUsuario scrobbles =
 
 gerarRankingPessoal :: Usuario -> IO ()
 gerarRankingPessoal usuario = do
-  scs <- carregarScrobbles
-  let scrobblesUsuario = filter (\s -> emailUsuario s == email usuario) scs
+  scrobbles <- carregarScrobbles
+  let scrobblesUsuario = [s | s <- scrobbles, emailUsuario s == email usuario]
   if null scrobblesUsuario
-    then putStrLn "Você ainda não tem scrobbles registrados."
+    then putStrLn "Você ainda não tem nenhum scrobble :( Que tal dar play em alguma música? ;)"
     else do
-      let musicas = map musica scrobblesUsuario
-          agrupadas = groupBy ((==) `on` titulo) $ sortBy (comparing titulo) musicas
-          contagens = map (\grp -> (head grp, length grp)) agrupadas
-          ordenado = sortBy (flip (comparing snd)) contagens
-      putStrLn "\nRanking pessoal - músicas mais escutadas:"
-      mapM_ (\(m, c) -> putStrLn $ titulo m ++ " - " ++ artista m ++ " | Ouvidas: " ++ show c) ordenado
+      let musicasOuvidas = map musica scrobblesUsuario
+          contagem :: [(Musica, Int)]
+          contagem = ordenaMusica musicasOuvidas
 
+          ordenar:: [(Musica, Int)] -> [(Musica, Int)]
+          ordenar [] = []
+          ordenar (primeiro : resto) = inserir primeiro (ordenar resto)
+            where
+              inserir :: (Musica, Int) -> [(Musica, Int)] -> [(Musica, Int)]
+              inserir (musica1, quantidadeVezes) [] = [(musica1, quantidadeVezes)]
+              inserir (musica1, quantidadeVezes) ((musica, quantidade): restoLista)
+                | quantidadeVezes >= quantidade = (musica1, quantidadeVezes) : (musica, quantidade) : restoLista
+                | otherwise = (musica, quantidade) : inserir (musica1, quantidadeVezes) restoLista
+          rank = ordenar contagem
+
+      putStrLn "\nRanking das suas músicas mais escutadas!! Veja seus hits do momento: "
+      printaORank rank 
+  where
+          printaORank [] = return ()
+          printaORank ((musica, qnt) : resto) = do
+            putStrLn (titulo musica ++ " - " ++ artista musica ++ " | Ouvidas: " ++ show qnt)
+            printaORank resto
+
+ordenaMusica:: [Musica] -> [(Musica, Int)]
+ordenaMusica [] = []
+ordenaMusica (musica1: musicasResto) =
+    let resto = ordenaMusica musicasResto
+        contarPrimeira musica1 [] = [(musica1, 1)]
+        contarPrimeira musica1 ((musicaNaLista, quantasVezes): restoDaLista)
+         |titulo musica1 == titulo musicaNaLista = (musicaNaLista, quantasVezes + 1) : restoDaLista
+         |otherwise = (musicaNaLista, quantasVezes) : contarPrimeira musica1 restoDaLista
+    in contarPrimeira musica1 resto
 
 gerarRankingGlobal :: IO ()
 gerarRankingGlobal = do
   usuarios <- carregarUsuarios
-  scs <- carregarScrobbles
-  let contarScrobbles u = length $ filter (\s -> emailUsuario s == email u) scs
-      ranking = map (\u -> (u, contarScrobbles u)) usuarios
-      rankingOrdenado = sortBy (flip (comparing snd)) ranking
-  putStrLn "\nRanking global de usuários por scrobbles:"
-  mapM_ (\(u, c) -> putStrLn $ nome u ++ " (" ++ email u ++ ") - Scrobbles: " ++ show c) rankingOrdenado
+  scrobbles <- carregarScrobbles
+  let contarScrobbles:: Usuario -> Int
+      contarScrobbles usuarioContandoSc = conta scrobbles 0
+        where
+          conta [] qntVezes = qntVezes
+          conta (scrobble1 : restoDeScrobble) qntVezes =
+            if emailUsuario scrobble1 == email usuarioContandoSc
+              then conta restoDeScrobble (qntVezes + 1)
+              else conta restoDeScrobble qntVezes
 
-
+      rankingNaoOrdenado :: [(Usuario, Int)]
+      rankingNaoOrdenado = [(usuarioAtual, contarScrobbles usuarioAtual) | usuarioAtual <- usuarios]
+      
+      ordenarSc :: [(Usuario, Int)] -> [(Usuario, Int)]
+      ordenarSc [] = []
+      ordenarSc (primeiroEl : restoSc) = inserir primeiroEl (ordenarSc restoSc)
+         where
+           inserir :: (Usuario, Int) -> [(Usuario, Int)] -> [(Usuario, Int)]
+           inserir usuarioEScrobble [] = [usuarioEScrobble]
+           inserir (usuario, qntSc) ((usuarioNaLista, qntLista): resto)
+            | qntSc >= qntLista  = (usuario, qntSc) : (usuarioNaLista, qntLista) : resto
+            | otherwise = (usuarioNaLista, qntLista) : inserir (usuario, qntSc) resto
+      ranking = ordenarSc rankingNaoOrdenado
+  putStrLn "\nRanking global do LASTFM com base nos seus scrobbles! Os maiores ouvintes da nossa plataforma :) :"
+  imprimeRank ranking
+  where
+    imprimeRank :: [(Usuario, Int)] -> IO ()
+    imprimeRank [] = return ()
+    imprimeRank ((usuario, qntsc):resto) = do
+      putStrLn (nome usuario ++ " (" ++ email usuario ++ ") está com - Scrobbles: " ++ show qntsc ++ " ;)")
+      imprimeRank resto    
 --verConquistas ::
 
 --recomendarMusicas ::

@@ -146,8 +146,18 @@ menuLogado usuario = do
         [(tipo, "")] | tipo `elem` [1,2,3] -> do
           parametro <- case tipo of
             1 -> do
-              putStrLn "\nDigite o gênero:"
-              getLine
+              let generosDisponiveis = ["Rock", "Pop", "Eletronica", "HipHop", "Rap", "Funk", "MPB", "Sertanejo", "Forro", "Indie", "Pagode"]
+              putStrLn "\n--- GÊNEROS DISPONÍVEIS: ---"
+              mapM_ (\(i, g) -> putStrLn $ show i ++ " - " ++ g) (zip [1..] generosDisponiveis)
+              putStr "\nDigite o número do gênero: "
+              hFlush stdout
+              generoIndexStr <- getLine
+              case reads generoIndexStr of
+                 [(idx, "")] | idx > 0 && idx <= length generosDisponiveis ->
+                    return (generosDisponiveis !! (idx - 1))
+                 _ -> do
+                    putStrLn "Gênero inválido. Tente Novamente."
+                    return ""
             2 -> do
               putStrLn "\nDigite o nome do artista:"
               getLine
@@ -172,12 +182,12 @@ menuLogado usuario = do
           scrobbles <- carregarScrobbles
           let compatibilidade = round((verificarCompatibilidade usuario outro scrobbles) * 100) :: Int
 
-          putStrLn $ "\n Seu match com " ++ nome outro ++ " é de: >>>  " ++ show compatibilidade ++"%  <<<"
-          if compatibilidade >= 80 then putStrLn "\n Que match hein!? Ótimo para montarem uma playlist compartilhada!"
-            else if compatibilidade <= 50 then putStrLn "\n Xiii... talvez vocês devam descobrir algo em comum."
-            else putStrLn "\n Nada mau! Vejo bons interesses em comum!"
+          putStrLn $ "\nSeu match com " ++ nome outro ++ " é de: >>>  " ++ show compatibilidade ++"%  <<<"
+          if compatibilidade >= 80 then putStrLn "\nQue match hein!? Ótimo para montarem uma playlist compartilhada!"
+            else if compatibilidade <= 50 then putStrLn "\nXiii... talvez vocês devam descobrir algo em comum."
+            else putStrLn "\nNada mau! Vejo bons interesses em comum!"
 
-        Nothing -> putStrLn "\n Usuário não encontrado! Tente novamente"
+        Nothing -> putStrLn "\nUsuário não encontrado! Tente novamente."
  
       menuLogado usuario
 

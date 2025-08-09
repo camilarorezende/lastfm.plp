@@ -230,7 +230,7 @@ gerarRankingGlobal = do
     imprimeRank :: [(Usuario, Int)] -> IO ()
     imprimeRank [] = return ()
     imprimeRank ((usuario, qntsc):resto) = do
-      putStrLn (nome usuario ++ " (" ++ email usuario ++ ") está com " ++ show qntsc ++ " Scrobbles!")
+      putStrLn (nome usuario ++ " (" ++ email usuario ++ ") está com " ++ show qntsc ++ " Scrobble(s)!")
       imprimeRank resto 
 
 verConquistas :: Usuario -> IO ()

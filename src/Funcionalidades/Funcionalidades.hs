@@ -202,36 +202,44 @@ gerarRankingGlobal :: IO ()
 gerarRankingGlobal = do
   usuarios <- carregarUsuarios
   scrobbles <- carregarScrobbles
-  let contarScrobbles:: Usuario -> Int
-      contarScrobbles usuarioContandoSc = conta scrobbles 0
-        where
-          conta [] qntVezes = qntVezes
-          conta (scrobble1 : restoDeScrobble) qntVezes =
-            if emailUsuario scrobble1 == email usuarioContandoSc
-              then conta restoDeScrobble (qntVezes + 1)
-              else conta restoDeScrobble qntVezes
 
-      rankingNaoOrdenado :: [(Usuario, Int)]
-      rankingNaoOrdenado = [(usuarioAtual, contarScrobbles usuarioAtual) | usuarioAtual <- usuarios]
-      
-      ordenarSc :: [(Usuario, Int)] -> [(Usuario, Int)]
-      ordenarSc [] = []
-      ordenarSc (primeiroEl : restoSc) = inserir primeiroEl (ordenarSc restoSc)
-         where
-           inserir :: (Usuario, Int) -> [(Usuario, Int)] -> [(Usuario, Int)]
-           inserir usuarioEScrobble [] = [usuarioEScrobble]
-           inserir (usuario, qntSc) ((usuarioNaLista, qntLista): resto)
-            | qntSc >= qntLista  = (usuario, qntSc) : (usuarioNaLista, qntLista) : resto
-            | otherwise = (usuarioNaLista, qntLista) : inserir (usuario, qntSc) resto
-      ranking = ordenarSc rankingNaoOrdenado
-  putStrLn "\nRanking global do LASTFM com base nos seus scrobbles! Os maiores ouvintes da nossa plataforma:"
-  imprimeRank ranking
+  if null usuarios
+    then putStrLn "\nNenhum usuário cadastrado ainda. Que tal ser o primeiro a se juntar ao LastFM? :)"
+    else do
+      let contarScrobbles :: Usuario -> Int
+          contarScrobbles usuarioContandoSc = conta scrobbles 0
+            where
+              conta [] qntVezes = qntVezes
+              conta (scrobble1 : restoDeScrobble) qntVezes =
+                if emailUsuario scrobble1 == email usuarioContandoSc
+                  then conta restoDeScrobble (qntVezes + 1)
+                  else conta restoDeScrobble qntVezes
+
+          rankingNaoOrdenado :: [(Usuario, Int)]
+          rankingNaoOrdenado = [(usuarioAtual, contarScrobbles usuarioAtual) | usuarioAtual <- usuarios]
+
+          ordenarSc :: [(Usuario, Int)] -> [(Usuario, Int)]
+          ordenarSc [] = []
+          ordenarSc (primeiroEl : restoSc) = inserir primeiroEl (ordenarSc restoSc)
+            where
+              inserir :: (Usuario, Int) -> [(Usuario, Int)] -> [(Usuario, Int)]
+              inserir usuarioEScrobble [] = [usuarioEScrobble]
+              inserir (usuario, qntSc) ((usuarioNaLista, qntLista): resto)
+                | qntSc >= qntLista  = (usuario, qntSc) : (usuarioNaLista, qntLista) : resto
+                | otherwise = (usuarioNaLista, qntLista) : inserir (usuario, qntSc) resto
+
+          ranking = ordenarSc rankingNaoOrdenado
+
+      putStrLn "\nRanking global do LASTFM com base nos seus scrobbles! Os maiores ouvintes da nossa plataforma:"
+      imprimeRank ranking
+
   where
     imprimeRank :: [(Usuario, Int)] -> IO ()
     imprimeRank [] = return ()
     imprimeRank ((usuario, qntsc):resto) = do
       putStrLn (nome usuario ++ " (" ++ email usuario ++ ") está com " ++ show qntsc ++ " Scrobble(s)!")
-      imprimeRank resto 
+      imprimeRank resto
+
 
 verConquistas :: Usuario -> IO ()
 verConquistas usuario = do

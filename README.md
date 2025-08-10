@@ -9,10 +9,10 @@ Todos os dados, como informações de usuários, execuções (*scrobbles*), esta
 ---
 
 ## 👥 Autores
-Camila Rezende
-José Daniel Brandão
-Lorena Agra
-Marina Morais
+- Camila Rezende
+- José Daniel Brandão
+- Lorena Agra
+- Marina Morais
 
 ---
 
@@ -32,13 +32,13 @@ Marina Morais
 
 > Certifique-se de ter o [GHC](https://www.haskell.org/ghc/) e o [Cabal](https://www.haskell.org/cabal/) instalados.
 
-# 1. Atualize os pacotes do cabal
+1. Atualize os pacotes do cabal
 cabal update
 
-# 2. Instale as dependências
+2. Instale as dependências
 cabal build
 
-# 3. Execute o projeto
+3. Execute o projeto
 cabal run
 
 ---
@@ -46,6 +46,6 @@ cabal run
 ## 💾 Persistência
 Os dados são armazenados nos seguintes arquivos:
 
-usuarios.json — usuários cadastrados
-scrobbles.json — execuções registradas
-catalogo.json — músicas disponíveis
+- usuarios.json — usuários cadastrados
+- scrobbles.json — execuções registradas
+- catalogo.json — músicas disponíveis

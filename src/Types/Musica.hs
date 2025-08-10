@@ -8,7 +8,7 @@ import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)
 
 data Musica = Musica {
-    nome :: String,
+    titulo :: String,
     artista :: String,
     album :: String,
     genero :: Genero,

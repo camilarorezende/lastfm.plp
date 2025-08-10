@@ -3,7 +3,6 @@
 
 module Types.Usuario where
 
-import Types.Scrobble
 import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)
 

@@ -32,13 +32,13 @@ Todos os dados, como informações de usuários, execuções (*scrobbles*), esta
 
 > Certifique-se de ter o [GHC](https://www.haskell.org/ghc/) e o [Cabal](https://www.haskell.org/cabal/) instalados.
 
-1. Atualize os pacotes do cabal
+# 1. Atualize os pacotes do cabal
 cabal update
 
-2. Instale as dependências
+# 2. Instale as dependências
 cabal build
 
-3. Execute o projeto
+# 3. Execute o projeto
 cabal run
 
 ---

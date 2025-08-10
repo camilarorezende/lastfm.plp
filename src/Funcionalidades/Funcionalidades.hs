@@ -6,26 +6,25 @@ import Types.Musica
 import Types.Scrobble
 import Types.Genero (Genero(..))
 import Types.Usuario (Usuario(..))
+import Funcionalidades.Conquistas
+
 import System.IO (hFlush, stdout)
-import Data.Aeson (encodeFile, decodeFileStrict, encode)
 import System.Directory (doesFileExist)
+
+import Data.Aeson (encodeFile, decodeFileStrict, encode, decode)
 import qualified Data.ByteString.Lazy as B
-import Data.Aeson (decode)
+
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Format (formatTime, defaultTimeLocale)
+
 import Data.Char (isLetter, isSpace)
-import Funcionalidades.Conquistas 
-import Data.List (nub)
+import Data.List (nub, find, intersect, intercalate, sortOn, group, sort, length, maximumBy, groupBy)
+
 import Control.Monad (unless)
-import Data.List (find)
-import qualified Data.ByteString.Lazy as B
-import Data.Time.Clock (getCurrentTime)
-import Data.Time.Format (formatTime, defaultTimeLocale)
-import Data.List (nub, intersect, intercalate, sortOn, group, sort, length, maximumBy, sortOn, groupBy)
-import System.Random.Shuffle (shuffleM)
-import Data.Ord (comparing)
 import Data.Function (on)
-import Data.Ord (Down(..))
+import Data.Ord (Down(..), comparing)
+
+import System.Random.Shuffle (shuffleM)
 
 
 

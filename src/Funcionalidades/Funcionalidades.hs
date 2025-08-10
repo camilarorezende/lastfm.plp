@@ -7,6 +7,7 @@ import Types.Scrobble
 import Types.Genero (Genero(..))
 import Types.Usuario (Usuario(..))
 import Funcionalidades.Conquistas
+import Data.Time.LocalTime (getZonedTime)
 
 import System.IO (hFlush, stdout)
 import System.Directory (doesFileExist)
@@ -122,7 +123,7 @@ loginUsuario emailInput senhaInput usuarios = do
     
 registrarScrobble :: Usuario -> Musica -> IO Usuario
 registrarScrobble usuario musicaEscolhida = do
-  hora <- getCurrentTime
+  hora <- getZonedTime
   let momento = formatTime defaultTimeLocale "%d/%m/%Y %H:%M" hora
       novoScrobble = Scrobble musicaEscolhida (email usuario) momento
 

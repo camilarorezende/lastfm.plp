@@ -18,15 +18,15 @@ import Funcionalidades.Conquistas
 import Data.List (nub)
 import Control.Monad (unless)
 import Data.List (find)
-import System.Directory (doesFileExist)
 import qualified Data.ByteString.Lazy as B
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Format (formatTime, defaultTimeLocale)
-import Data.Char (isLetter, isSpace)
-import Data.List (nub, intersect, intercalate, sortOn, group, sort, length, maximumBy)
-import Data.List (find)
+import Data.List (nub, intersect, intercalate, sortOn, group, sort, length, maximumBy, sortOn, groupBy)
 import System.Random.Shuffle (shuffleM)
 import Data.Ord (comparing)
+import Data.Function (on)
+import Data.Ord (Down(..))
+
 
 
 scrobbleArquivo :: FilePath
@@ -70,7 +70,6 @@ atualizarUsuario usuarioAtualizado = do
         (\u -> if email u == email usuarioAtualizado then usuarioAtualizado else u)
         usuarios
   salvarUsuarios usuariosAtualizados
-
 
 carregarCatalogo :: IO [Musica]
 carregarCatalogo = do
@@ -149,7 +148,6 @@ registrarScrobble usuario musicaEscolhida = do
 
   return usuarioAtualizado
 
-
 historicoDoUsuario :: [Scrobble] -> IO ()
 historicoDoUsuario scrobbles = 
   if null scrobbles
@@ -157,6 +155,16 @@ historicoDoUsuario scrobbles =
     else do
       putStrLn "\nSeu histórico de scrobbles:"
       mapM_ (\s -> putStrLn $ "- " ++ titulo (musica s) ++ " - " ++ artista (musica s) ++ " - " ++ album (musica s) ++ " (" ++ momento s ++ ")") scrobbles
+      
+      let tempoTotal = sum [duracao (musica s) | s <- scrobbles]
+      putStrLn $ "\nTempo total escutado: " ++ formatTempo tempoTotal
+
+  where
+    formatTempo :: Int -> String
+    formatTempo totalSegundos =
+      let (h, rest1) = totalSegundos `divMod` 3600
+          (m, s) = rest1 `divMod` 60
+      in show h ++ "h " ++ show m ++ "m " ++ show s ++ "s"
 
 gerarRankingPessoal :: Usuario -> IO ()
 gerarRankingPessoal usuario = do
@@ -166,10 +174,11 @@ gerarRankingPessoal usuario = do
     then putStrLn "Você ainda não tem nenhum scrobble :( Que tal dar play em alguma música? ;)"
     else do
       let musicasOuvidas = map musica scrobblesUsuario
-          contagem :: [(Musica, Int)]
-          contagem = ordenaMusica musicasOuvidas
 
-          ordenar:: [(Musica, Int)] -> [(Musica, Int)]
+          contagemMusicas :: [(Musica, Int)]
+          contagemMusicas = ordenaMusica musicasOuvidas
+
+          ordenar :: [(Musica, Int)] -> [(Musica, Int)]
           ordenar [] = []
           ordenar (primeiro : resto) = inserir primeiro (ordenar resto)
             where
@@ -178,15 +187,35 @@ gerarRankingPessoal usuario = do
               inserir (musica1, quantidadeVezes) ((musica, quantidade): restoLista)
                 | quantidadeVezes >= quantidade = (musica1, quantidadeVezes) : (musica, quantidade) : restoLista
                 | otherwise = (musica, quantidade) : inserir (musica1, quantidadeVezes) restoLista
-          rank = ordenar contagem
+          rankMusicas = ordenar contagemMusicas
 
-      putStrLn "\nRanking das suas músicas mais escutadas!! Veja seus hits do momento: "
-      printaORank rank 
+          generosOuvidos = map genero musicasOuvidas
+
+          contagemGeneros :: [(Genero, Int)]
+          contagemGeneros = ordenarGenero generosOuvidos
+
+          ordenarGenero :: [Genero] -> [(Genero, Int)]
+          ordenarGenero generos =
+            let agrupados = groupBy (==) $ sortOn id generos
+                contados = map (\g -> (head g, length g)) agrupados
+            in sortOn (Down . snd) contados
+
+      putStrLn "\nRanking das suas músicas mais escutadas! Veja seus hits do momento: "
+      printaORank rankMusicas
+
+      putStrLn "\nRanking dos gêneros mais ouvidos:"
+      printaORankGeneros contagemGeneros
+
   where
-          printaORank [] = return ()
-          printaORank ((musica, qnt) : resto) = do
-            putStrLn (titulo musica ++ " - " ++ artista musica ++ " | Ouvidas: " ++ show qnt)
-            printaORank resto
+    printaORank [] = return ()
+    printaORank ((musica, qnt) : resto) = do
+      putStrLn (titulo musica ++ " - " ++ artista musica ++ " | Ouvidas: " ++ show qnt)
+      printaORank resto
+
+    printaORankGeneros [] = return ()
+    printaORankGeneros ((genero, qnt) : resto) = do
+      putStrLn (show genero ++ " | Ouvidas: " ++ show qnt)
+      printaORankGeneros resto
 
 ordenaMusica:: [Musica] -> [(Musica, Int)]
 ordenaMusica [] = []
@@ -206,39 +235,51 @@ gerarRankingGlobal = do
   if null usuarios
     then putStrLn "\nNenhum usuário cadastrado ainda. Que tal ser o primeiro a se juntar ao LastFM? :)"
     else do
-      let contarScrobbles :: Usuario -> Int
-          contarScrobbles usuarioContandoSc = conta scrobbles 0
-            where
-              conta [] qntVezes = qntVezes
-              conta (scrobble1 : restoDeScrobble) qntVezes =
-                if emailUsuario scrobble1 == email usuarioContandoSc
-                  then conta restoDeScrobble (qntVezes + 1)
-                  else conta restoDeScrobble qntVezes
+      let
+        scrobblesDoUsuario u = filter (\s -> emailUsuario s == email u) scrobbles
 
-          rankingNaoOrdenado :: [(Usuario, Int)]
-          rankingNaoOrdenado = [(usuarioAtual, contarScrobbles usuarioAtual) | usuarioAtual <- usuarios]
+        contarScrobbles u = length (scrobblesDoUsuario u)
 
-          ordenarSc :: [(Usuario, Int)] -> [(Usuario, Int)]
-          ordenarSc [] = []
-          ordenarSc (primeiroEl : restoSc) = inserir primeiroEl (ordenarSc restoSc)
-            where
-              inserir :: (Usuario, Int) -> [(Usuario, Int)] -> [(Usuario, Int)]
-              inserir usuarioEScrobble [] = [usuarioEScrobble]
-              inserir (usuario, qntSc) ((usuarioNaLista, qntLista): resto)
-                | qntSc >= qntLista  = (usuario, qntSc) : (usuarioNaLista, qntLista) : resto
-                | otherwise = (usuarioNaLista, qntLista) : inserir (usuario, qntSc) resto
+        tempoTotal u = sum [duracao (musica s) | s <- scrobblesDoUsuario u]
 
-          ranking = ordenarSc rankingNaoOrdenado
+        topArtistas u = take 3 $ sortOn (Down . snd) $
+          map (\grp -> (artista $ musica $ head grp, length grp)) $
+          groupBy ((==) `on` (artista . musica)) $
+          sortOn (artista . musica) (scrobblesDoUsuario u)
 
-      putStrLn "\nRanking global do LASTFM com base nos seus scrobbles! Os maiores ouvintes da nossa plataforma:"
+        topMusicas u = take 3 $ sortOn (Down . snd) $
+          map (\grp -> (titulo $ musica $ head grp, length grp)) $
+          groupBy ((==) `on` (titulo . musica)) $
+          sortOn (titulo . musica) (scrobblesDoUsuario u)
+
+        rankingNaoOrdenado :: [(Usuario, Int, Int, [(String, Int)], [(String, Int)])]
+        rankingNaoOrdenado = [ (u, contarScrobbles u, tempoTotal u, topArtistas u, topMusicas u) | u <- usuarios ]
+
+        ranking = sortOn (\(_, qnt, _, _, _) -> Down qnt) rankingNaoOrdenado
+
+      putStrLn "\nRanking global do LASTFM baseado nos seus scrobbles! Os maiores ouvintes da nossa plataforma:\n"
       imprimeRank ranking
 
   where
-    imprimeRank :: [(Usuario, Int)] -> IO ()
+    imprimeRank :: [(Usuario, Int, Int, [(String, Int)], [(String, Int)])] -> IO ()
     imprimeRank [] = return ()
-    imprimeRank ((usuario, qntsc):resto) = do
-      putStrLn (nome usuario ++ " (" ++ email usuario ++ ") está com " ++ show qntsc ++ " Scrobble(s)!")
+    imprimeRank ((usuario, qntsc, tempo, artistas, musicas):resto) = do
+      putStrLn $ nome usuario ++ " (" ++ email usuario ++ ")"
+      putStrLn $ "  - Scrobbles: " ++ show qntsc
+      putStrLn $ "  - Tempo total escutado: " ++ formatTempo tempo
+      putStrLn $ "  - Top artistas:"
+      mapM_ (\(artista, cnt) -> putStrLn $ "      * " ++ artista ++ " (" ++ show cnt ++ " scrobbles)") artistas
+      putStrLn $ "  - Top músicas:"
+      mapM_ (\(titulo, cnt) -> putStrLn $ "      * " ++ titulo ++ " (" ++ show cnt ++ " scrobbles)") musicas
+      putStrLn ""
       imprimeRank resto
+
+    formatTempo :: Int -> String
+    formatTempo totalSegundos =
+      let (h, rest1) = totalSegundos `divMod` 3600
+          (m, s) = rest1 `divMod` 60
+      in show h ++ "h " ++ show m ++ "m " ++ show s ++ "s"
+
 
 
 verConquistas :: Usuario -> IO ()

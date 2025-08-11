@@ -22,6 +22,7 @@ Todos os dados, como informações de usuários, execuções (*scrobbles*), esta
 - 🎧 Registro de scrobbles  
 - 🕓 Histórico do usuário  
 - 🏆 Ranking pessoal e global  
+- 🌎 Estatísticas globais
 - 🥇 Desbloqueio de conquistas  
 - 🎯 Recomendação personalizada  
 - 💞 Compatibilidade entre perfis  

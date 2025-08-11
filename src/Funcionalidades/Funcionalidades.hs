@@ -196,9 +196,32 @@ gerarRankingPessoal usuario = do
 
           ordenarGenero :: [Genero] -> [(Genero, Int)]
           ordenarGenero generos =
-            let agrupados = groupBy (==) $ sortOn id generos
-                contados = map (\g -> (head g, length g)) agrupados
-            in sortOn (Down . snd) contados
+            let contagens = contarGeneros generos
+            in ordenarPorFrequenciaDecrescente contagens
+
+          contarGeneros :: [Genero] -> [(Genero, Int)]
+          contarGeneros [] = []
+          contarGeneros (generoAtual : demaisGeneros) =
+            let contagensParciais = contarGeneros demaisGeneros
+            in inserirOuIncrementar generoAtual contagensParciais
+
+          inserirOuIncrementar :: Genero -> [(Genero, Int)] -> [(Genero, Int)]
+          inserirOuIncrementar generoProcurado [] = [(generoProcurado, 1)]
+          inserirOuIncrementar generoProcurado ((generoNaLista, qtd) : restoDaLista)
+            | generoProcurado == generoNaLista = (generoNaLista, qtd + 1) : restoDaLista
+            | otherwise = (generoNaLista, qtd) : inserirOuIncrementar generoProcurado restoDaLista
+
+          ordenarPorFrequenciaDecrescente :: [(Genero, Int)] -> [(Genero, Int)]
+          ordenarPorFrequenciaDecrescente [] = []
+          ordenarPorFrequenciaDecrescente (parAtual : paresRestantes) =
+            inserirEmOrdem parAtual (ordenarPorFrequenciaDecrescente paresRestantes)
+
+          inserirEmOrdem :: (Genero, Int) -> [(Genero, Int)] -> [(Genero, Int)]
+          inserirEmOrdem par [] = [par]
+          inserirEmOrdem (generoA, qtdA) ((generoB, qtdB) : resto)
+            | qtdA >= qtdB = (generoA, qtdA) : (generoB, qtdB) : resto
+            | otherwise    = (generoB, qtdB) : inserirEmOrdem (generoA, qtdA) resto
+
 
       putStrLn "\nRanking das suas músicas mais escutadas! Veja seus hits do momento: "
       printaORank rankMusicas

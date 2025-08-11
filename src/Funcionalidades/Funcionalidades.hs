@@ -2,30 +2,22 @@
 
 module Funcionalidades.Funcionalidades where
 
-import Types.Musica    hiding (nome)        
-import Types.Scrobble  (Scrobble(..))       
+import Types.Musica    hiding (nome)
+import Types.Scrobble  (Scrobble(..))
 import Types.Genero    (Genero(..))
-import Types.Usuario   (Usuario(..))        
+import Types.Usuario   (Usuario(..))
 import Funcionalidades.Conquistas
-import Data.Time.LocalTime (getZonedTime)
-import System.IO (hFlush, stdout)
 import System.Directory (doesFileExist)
 import Data.Aeson (encodeFile, decodeFileStrict, encode, decode)
 import qualified Data.ByteString.Lazy as B
-import Data.Time.Clock (getCurrentTime)
-import Data.Time.Format (formatTime, defaultTimeLocale)
 import Data.Time.LocalTime (getZonedTime)
-import System.IO (hFlush, stdout)
-import System.Directory (doesFileExist)
+import Data.Time.Format (formatTime, defaultTimeLocale)
 import System.Random.Shuffle (shuffleM)
 import Control.Monad (unless)
 import Data.Char (isLetter, isSpace)
 import Data.List (group, sort, sortOn, groupBy, maximumBy, nub, intersect)
 import Data.Function (on)
 import Data.Ord (Down(..), comparing)
-
-import Data.Time.Format (formatTime, defaultTimeLocale)
-
 
 scrobbleArquivo :: FilePath
 scrobbleArquivo = "scrobbles.json"

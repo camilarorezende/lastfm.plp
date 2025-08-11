@@ -100,7 +100,7 @@ menuLogado usuario = do
       putStrLn "\n=========== SEU PERFIL ============"
       putStrLn ("Nome: " ++ nome usuario)
       putStrLn ("Email: " ++ email usuario)
-      putStrLn ("Conquistas: " ++ show (conquistas usuario))
+      
       scs <- carregarScrobbles
       let scrobbles = filter (\s -> emailUsuario s == email usuario) scs
       historicoDoUsuario scrobbles

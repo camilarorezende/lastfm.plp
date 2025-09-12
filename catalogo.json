@@ -1,17 +1,6 @@
-[
- {
-     "titulo": "Infiel",
-    "artista": "Marilia",
-    "album": "Infiel",
-    "genero": "Sertanejo",
-    "duracao": 120
- },
- {
-     "titulo": "É Você",
-    "artista": "Tribalistas",
-    "album": "Tribalistas (2002, remaster em 2004)",
-    "genero": "MPB",
-    "duracao": 171
- }
-
-]
+{
+  "catalogo": [
+    { "titulo": "Song1", "artista": "Artist1", "album": "Album1", "genero": "Rock" },
+    { "titulo": "Song2", "artista": "Artist2", "album": "Album2", "genero": "Pop" }
+  ]
+}

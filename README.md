@@ -44,10 +44,10 @@ cabal run
 
 ## 🚀 Como executar Prolog (via SWI-Prolog)
 
-> Certifique-se de ter o SWI-Prolog (https://www.swi-prolog.org/Download.html) instalado.
+> Certifique-se de ter o [SWI-Prolog](https://www.swi-prolog.org/Download.html) instalado.
 
 # 1. Navegue até o diretório 'main'
-cd astfm.plp\prolog\main
+cd lastfm.plp\prolog\main
 
 # 2. Inicie o inerpretador no SWI-Prolog
 swipl

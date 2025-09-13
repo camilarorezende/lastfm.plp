@@ -1,56 +1,55 @@
-:- use_module(library(lists)).
-:- use_module(library(apply)).
 
-:- dynamic scrobble/7.
-
-conquistas_disponiveis([
-  "Primeiro Scrobble!",
-  "10 músicas ouvidas",
-  "100 minutos escutados"
+:- module(conquistas, [
+    get_conquistas_usuario/2 
 ]).
 
-conquista(Usuario, "Primeiro Scrobble!") :-
-  findall(_, scrobble(Usuario, _, _, _, _, _, _), Scs),
-  length(Scs, N),
-  N >= 1.
+:- use_module(library(lists)).
+:- use_module(library(solution_sequences)). 
+get_conquistas_usuario(ScrobblesUsuario, TodasConquistas) :-
+    length(ScrobblesUsuario, TotalScrobbles),
+    findall(D, (member(S, ScrobblesUsuario), D = S.musica.duracao), Duracoes),
+    sum_list(Duracoes, TotalSegundos),
+    TotalMinutos is TotalSegundos // 60,
+    regras(TotalScrobbles, TotalMinutos, ConquistasFixas),
+    findall(A, (member(S, ScrobblesUsuario), A = S.musica.artista), Artistas),
+    group_count(Artistas, ContagemArtistas),
+    findall(Conquista, (
+        member((Artista, N), ContagemArtistas),
+        N >= 50,
+        format(string(Conquista), 'Super Fã de ~s', [Artista])
+    ), SuperFaArtistas),
+    findall(musica(T, A), (
+        member(S, ScrobblesUsuario),
+        M = S.musica, T = M.titulo, A = M.artista
+    ), MusicasChave),
+    group_count(MusicasChave, ContagemMusicas),
+    findall(Conquista, (
+        member((musica(T, A), N), ContagemMusicas),
+        N >= 50,
+        format(string(Conquista), 'Super Fã da música ~s - ~s', [T, A])
+    ), SuperFaMusicas),
+    append(ConquistasFixas, SuperFaArtistas, TempConquistas),
+    append(TempConquistas, SuperFaMusicas, TodasConquistas).
+regras(TotalScrobbles, TotalMinutos, Conquistas) :-
+    findall(Conquista,
+            regra_valida(TotalScrobbles, TotalMinutos, Conquista),
+            Conquistas).
 
-conquista(Usuario, "10 músicas ouvidas") :-
-  findall(_, scrobble(Usuario, _, _, _, _, _, _), Scs),
-  length(Scs, N),
-  N >= 10.
+regra_valida(TS, _, "Primeiro Scrobble!")     :- TS >= 1.
+regra_valida(TS, _, "10 músicas ouvidas")      :- TS >= 10.
+regra_valida(_, TM, "100 minutos escutados") :- TM >= 100.
+group_count(Lista, Contagem) :-
+    msort(Lista, ListaOrdenada),
+    clumped(ListaOrdenada, Agrupado), 
+    maplist(item_contagem, Agrupado, Contagem). 
 
-conquista(Usuario, "100 minutos escutados") :-
-  findall(Minutos, scrobble(Usuario, _, _, Minutos, _, _, _), Tempos),
-  sum_list(Tempos, Total),
-  Total >= 100.
+item_contagem(Grupo, (Item, Contagem)) :-
+    Grupo = [Item|_],
+    length(Grupo, Contagem).
 
-conquista(Usuario, Conquista) :-
-  findall(Artista, scrobble(Usuario, _, Artista, _, _, _, _), Artistas),
-  mais_frequente_ou_none(Artistas, Mais),
-  Mais \= none,
-  string_concat("Super Fã de ", Mais, Conquista).
-
-conquista(Usuario, Conquista) :-
-  findall(Genero, scrobble(Usuario, _, _, _, Genero, _, _), Generos),
-  mais_frequente_ou_none(Generos, Mais),
-  Mais \= none,
-  string_concat("Viciado em ", Mais, Conquista).
-
-mais_frequente_ou_none([], none).
-mais_frequente_ou_none(Lista, ItemMais) :-
-  msort(Lista, Ordenada),
-  clumped(Ordenada, Pares),
-  maplist(inverter_par, Pares, Inver),
-  keysort(Inver, Asc),
-  reverse(Asc, [Freq-ItemMais|_]).
-
-inverter_par(Item-Freq, Freq-Item).
-
-listar_conquistas(Usuario) :-
-  findall(C, conquista(Usuario, C), Todas),
-  sort(Todas, Conquistas),
-  format('Conquistas de ~w:\n', [Usuario]),
-  ( Conquistas == [] ->
-      true
-  ; forall(member(C, Conquistas), format('- ~w\n', [C]))
-  ).
+conquistas_disponiveis([
+    "Primeiro Scrobble!",
+    "10 músicas ouvidas",
+    "100 minutos escutados"
+  
+]).

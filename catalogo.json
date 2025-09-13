@@ -1,6 +1,864 @@
-{
-  "catalogo": [
-    { "titulo": "Song1", "artista": "Artist1", "album": "Album1", "genero": "Rock" },
-    { "titulo": "Song2", "artista": "Artist2", "album": "Album2", "genero": "Pop" }
-  ]
-}
+[
+  {
+    "titulo": "Hotel California",
+    "artista": "Eagles",
+    "album": "Hotel California",
+    "genero": "Rock",
+    "duracao": 394
+  },
+  {
+    "titulo": "Welcome to the Jungle",
+    "artista": "Guns N' Roses",
+    "album": "Appetite for Destruction",
+    "genero": "Rock",
+    "duracao": 273
+  },
+  {
+    "titulo": "Smells Like Teen Spirit",
+    "artista": "Nirvana",
+    "album": "Nevermind",
+    "genero": "Rock",
+    "duracao": 301
+  },
+  {
+    "titulo": "Bohemian Rhapsody",
+    "artista": "Queen",
+    "album": "A Night at the Opera",
+    "genero": "Rock",
+    "duracao": 354
+  },
+  {
+    "titulo": "Back in Black",
+    "artista": "AC/DC",
+    "album": "Back in Black",
+    "genero": "Rock",
+    "duracao": 255
+  },
+  {
+    "titulo": "Sweet Child O' Mine",
+    "artista": "Guns N' Roses",
+    "album": "Appetite for Destruction",
+    "genero": "Rock",
+    "duracao": 356
+  },
+  {
+    "titulo": "Paint It Black",
+    "artista": "The Rolling Stones",
+    "album": "Aftermath",
+    "genero": "Rock",
+    "duracao": 200
+  },
+  {
+    "titulo": "Comfortably Numb",
+    "artista": "Pink Floyd",
+    "album": "The Wall",
+    "genero": "Rock",
+    "duracao": 384
+  },
+  {
+    "titulo": "Born to Run",
+    "artista": "Bruce Springsteen",
+    "album": "Born to Run",
+    "genero": "Rock",
+    "duracao": 270
+  },
+  {
+    "titulo": "Stairway to Heaven",
+    "artista": "Led Zeppelin",
+    "album": "Led Zeppelin IV",
+    "genero": "Rock",
+    "duracao": 482
+  },
+  {
+    "titulo": "Paradise City",
+    "artista": "Guns N' Roses",
+    "album": "Appetite for Destruction",
+    "genero": "Rock",
+    "duracao": 406
+  },
+  {
+    "titulo": "In Bloom",
+    "artista": "Nirvana",
+    "album": "Nevermind",
+    "genero": "Rock",
+    "duracao": 254
+  },
+  {
+    "titulo": "Another Brick in the Wall, Pt. 2",
+    "artista": "Pink Floyd",
+    "album": "The Wall",
+    "genero": "Rock",
+    "duracao": 239
+  },
+  {
+    "titulo": "Highway to Hell",
+    "artista": "AC/DC",
+    "album": "Highway to Hell",
+    "genero": "Rock",
+    "duracao": 208
+  },
+  {
+    "titulo": "Blinding Lights",
+    "artista": "The Weeknd",
+    "album": "After Hours",
+    "genero": "Pop",
+    "duracao": 200
+  },
+  {
+    "titulo": "Levitating",
+    "artista": "Dua Lipa",
+    "album": "Future Nostalgia",
+    "genero": "Pop",
+    "duracao": 203
+  },
+  {
+    "titulo": "Shake It Off",
+    "artista": "Taylor Swift",
+    "album": "1989",
+    "genero": "Pop",
+    "duracao": 242
+  },
+  {
+    "titulo": "Uptown Funk",
+    "artista": "Mark Ronson ft. Bruno Mars",
+    "album": "Uptown Special",
+    "genero": "Pop",
+    "duracao": 269
+  },
+  {
+    "titulo": "Bad Guy",
+    "artista": "Billie Eilish",
+    "album": "When We All Fall Asleep, Where Do We Go?",
+    "genero": "Pop",
+    "duracao": 194
+  },
+  {
+    "titulo": "Watermelon Sugar",
+    "artista": "Harry Styles",
+    "album": "Fine Line",
+    "genero": "Pop",
+    "duracao": 174
+  },
+  {
+    "titulo": "Sorry",
+    "artista": "Justin Bieber",
+    "album": "Purpose",
+    "genero": "Pop",
+    "duracao": 200
+  },
+  {
+    "titulo": "Roar",
+    "artista": "Katy Perry",
+    "album": "Prism",
+    "genero": "Pop",
+    "duracao": 223
+  },
+  {
+    "titulo": "Rolling in the Deep",
+    "artista": "Adele",
+    "album": "21",
+    "genero": "Pop",
+    "duracao": 228
+  },
+  {
+    "titulo": "Rock That Body",
+    "artista": "Black Eyed Peas",
+    "album": "The E.N.D",
+    "genero": "Pop",
+    "duracao": 267
+  },
+  {
+    "titulo": "As It Was",
+    "artista": "Harry Styles",
+    "album": "Harry's House",
+    "genero": "Pop",
+    "duracao": 167
+  },
+  {
+    "titulo": "Anti-Hero",
+    "artista": "Taylor Swift",
+    "album": "Midnights",
+    "genero": "Pop",
+    "duracao": 200
+  },
+  {
+    "titulo": "Havana",
+    "artista": "Camila Cabello ft. Young Thug",
+    "album": "Camila",
+    "genero": "Pop",
+    "duracao": 217
+  },
+  {
+    "titulo": "Shallow",
+    "artista": "Lady Gaga & Bradley Cooper",
+    "album": "A Star Is Born Soundtrack",
+    "genero": "Pop",
+    "duracao": 215
+  },
+  {
+    "titulo": "Someone You Loved",
+    "artista": "Lewis Capaldi",
+    "album": "Divinely Uninspired to a Hellish Extent",
+    "genero": "Pop",
+    "duracao": 182
+  },
+  {
+    "titulo": "Strobe",
+    "artista": "Deadmau5",
+    "album": "For Lack of a Better Name",
+    "genero": "Eletronica",
+    "duracao": 630
+  },
+  {
+    "titulo": "Titanium",
+    "artista": "David Guetta ft. Sia",
+    "album": "Nothing but the Beat",
+    "genero": "Eletronica",
+    "duracao": 245
+  },
+  {
+    "titulo": "Levels",
+    "artista": "Avicii",
+    "album": "Levels",
+    "genero": "Eletronica",
+    "duracao": 227
+  },
+  {
+    "titulo": "Animals",
+    "artista": "Martin Garrix",
+    "album": "Animals",
+    "genero": "Eletronica",
+    "duracao": 256
+  },
+  {
+    "titulo": "Stay",
+    "artista": "Zedd & Alessia Cara",
+    "album": "Stay",
+    "genero": "Eletronica",
+    "duracao": 210
+  },
+  {
+    "titulo": "Lean On",
+    "artista": "Major Lazer & DJ Snake ft. MØ",
+    "album": "Peace Is the Mission",
+    "genero": "Eletronica",
+    "duracao": 176
+  },
+  {
+    "titulo": "Clarity",
+    "artista": "Zedd ft. Foxes",
+    "album": "Clarity",
+    "genero": "Eletronica",
+    "duracao": 257
+  },
+  {
+    "titulo": "Toulouse",
+    "artista": "Nicky Romero",
+    "album": "Toulouse",
+    "genero": "Eletronica",
+    "duracao": 312
+  },
+  {
+    "titulo": "Ghosts 'n' Stuff",
+    "artista": "Deadmau5 ft. Rob Swire",
+    "album": "For Lack of a Better Name",
+    "genero": "Eletronica",
+    "duracao": 217
+  },
+  {
+    "titulo": "Wake Me Up",
+    "artista": "Avicii",
+    "album": "True",
+    "genero": "Eletronica",
+    "duracao": 247
+  },
+  {
+    "titulo": "Faded",
+    "artista": "Alan Walker",
+    "album": "Different World",
+    "genero": "Eletronica",
+    "duracao": 212
+  },
+  {
+    "titulo": "Turn Down for What",
+    "artista": "DJ Snake & Lil Jon",
+    "album": "Turn Down for What",
+    "genero": "Eletronica",
+    "duracao": 213
+  },
+  {
+    "titulo": "Midnight Hour",
+    "artista": "Skrillex, Boys Noize & Ty Dolla $ign",
+    "album": "Midnight Hour",
+    "genero": "Eletronica",
+    "duracao": 181
+  },
+  {
+    "titulo": "Firestone",
+    "artista": "Kygo ft. Conrad Sewell",
+    "album": "Cloud Nine",
+    "genero": "Eletronica",
+    "duracao": 243
+  },
+  {
+    "titulo": "Sicko Mode",
+    "artista": "Travis Scott",
+    "album": "Astroworld",
+    "genero": "HipHop",
+    "duracao": 312
+  },
+  {
+    "titulo": "God's Plan",
+    "artista": "Drake",
+    "album": "Scorpion",
+    "genero": "HipHop",
+    "duracao": 198
+  },
+  {
+    "titulo": "Lose Yourself",
+    "artista": "Eminem",
+    "album": "8 Mile: Music from and Inspired by the Motion Picture",
+    "genero": "HipHop",
+    "duracao": 326
+  },
+  {
+    "titulo": "HUMBLE.",
+    "artista": "Kendrick Lamar",
+    "album": "DAMN.",
+    "genero": "HipHop",
+    "duracao": 177
+  },
+  {
+    "titulo": "Stronger",
+    "artista": "Kanye West",
+    "album": "Graduation",
+    "genero": "HipHop",
+    "duracao": 311
+  },
+  {
+    "titulo": "Old Town Road",
+    "artista": "Lil Nas X ft. Billy Ray Cyrus",
+    "album": "7 EP",
+    "genero": "HipHop",
+    "duracao": 157
+  },
+  {
+    "titulo": "Suge",
+    "artista": "DaBaby",
+    "album": "Baby on Baby",
+    "genero": "HipHop",
+    "duracao": 161
+  },
+  {
+    "titulo": "XO TOUR Llif3",
+    "artista": "Lil Uzi Vert",
+    "album": "Luv Is Rage 2",
+    "genero": "HipHop",
+    "duracao": 223
+  },
+  {
+    "titulo": "Rockstar",
+    "artista": "Post Malone ft. 21 Savage",
+    "album": "Beerbongs & Bentleys",
+    "genero": "HipHop",
+    "duracao": 218
+  },
+  {
+    "titulo": "Empire State of Mind",
+    "artista": "Jay-Z ft. Alicia Keys",
+    "album": "The Blueprint 3",
+    "genero": "HipHop",
+    "duracao": 276
+  },
+  {
+    "titulo": "Rap God",
+    "artista": "Eminem",
+    "album": "The Marshall Mathers LP 2",
+    "genero": "Rap",
+    "duracao": 363
+  },
+  {
+    "titulo": "In Da Club",
+    "artista": "50 Cent",
+    "album": "Get Rich or Die Tryin'",
+    "genero": "Rap",
+    "duracao": 193
+  },
+  {
+    "titulo": "Lose Control",
+    "artista": "Missy Elliott ft. Ciara & Fatman Scoop",
+    "album": "The Cookbook",
+    "genero": "Rap",
+    "duracao": 226
+  },
+  {
+    "titulo": "Many Men (Wish Death)",
+    "artista": "50 Cent",
+    "album": "Get Rich or Die Tryin'",
+    "genero": "Rap",
+    "duracao": 265
+  },
+  {
+    "titulo": "All The Way Up",
+    "artista": "Fat Joe & Remy Ma ft. French Montana",
+    "album": "Plata o Plomo",
+    "genero": "Rap",
+    "duracao": 230
+  },
+  {
+    "titulo": "Stan",
+    "artista": "Eminem ft. Dido",
+    "album": "The Marshall Mathers LP",
+    "genero": "Rap",
+    "duracao": 404
+  },
+  {
+    "titulo": "King's Dead",
+    "artista": "Jay Rock, Kendrick Lamar, Future, James Blake",
+    "album": "Black Panther: The Album",
+    "genero": "Rap",
+    "duracao": 239
+  },
+  {
+    "titulo": "No Role Modelz",
+    "artista": "J. Cole",
+    "album": "2014 Forest Hills Drive",
+    "genero": "Rap",
+    "duracao": 292
+  },
+  {
+    "titulo": "I'm Not Afraid",
+    "artista": "Eminem",
+    "album": "Recovery",
+    "genero": "Rap",
+    "duracao": 258
+  },
+  {
+    "titulo": "Alone",
+    "artista": "NF",
+    "album": "Therapy Session",
+    "genero": "Rap",
+    "duracao": 269
+  },
+  {
+    "titulo": "Vai Malandra",
+    "artista": "Anitta ft. MC Zaac, Maejor, Tropkillaz & DJ Yuri Martins",
+    "album": "CheckMate",
+    "genero": "Funk",
+    "duracao": 151
+  },
+  {
+    "titulo": "Olha a Explosão",
+    "artista": "MC Kevinho",
+    "album": "O Bebê (single)",
+    "genero": "Funk",
+    "duracao": 150
+  },
+  {
+    "titulo": "Bum Bum Tam Tam",
+    "artista": "MC Fioti",
+    "album": "Bum Bum Tam Tam (single)",
+    "genero": "Funk",
+    "duracao": 150
+  },
+  {
+    "titulo": "Deu Onda",
+    "artista": "MC G15",
+    "album": "Deu Onda (single)",
+    "genero": "Funk",
+    "duracao": 199
+  },
+  {
+    "titulo": "Parado no Bailão",
+    "artista": "MC L da Vinte & MC Gury",
+    "album": "Parado no Bailão (single)",
+    "genero": "Funk",
+    "duracao": 154
+  },
+  {
+    "titulo": "Só Você",
+    "artista": "Dennis DJ & MC G15",
+    "album": "Só Você (single)",
+    "genero": "Funk",
+    "duracao": 180
+  },
+  {
+    "titulo": "Contatinho",
+    "artista": "Nego do Borel ft. Luan Santana",
+    "album": "Contatinho (single)",
+    "genero": "Funk",
+    "duracao": 205
+  },
+  {
+    "titulo": "Menina Má",
+    "artista": "MC Kevinho",
+    "album": "MC Kevinho (album)",
+    "genero": "Funk",
+    "duracao": 180
+  },
+  {
+    "titulo": "Oh Novinha",
+    "artista": "MC Don Juan",
+    "album": "Oh Novinha (single)",
+    "genero": "Funk",
+    "duracao": 170
+  },
+  {
+    "titulo": "Tá Tum Tum",
+    "artista": "MC Kevinho & Simone & Simaria",
+    "album": "MC Kevinho (album)",
+    "genero": "Funk",
+    "duracao": 170
+  },
+  {
+    "titulo": "Águas de Março",
+    "artista": "Tom Jobim & Elis Regina",
+    "album": "Elis & Tom",
+    "genero": "MPB",
+    "duracao": 142
+  },
+  {
+    "titulo": "Chega de Saudade",
+    "artista": "João Gilberto",
+    "album": "Chega de Saudade",
+    "genero": "MPB",
+    "duracao": 179
+  },
+  {
+    "titulo": "Cálice",
+    "artista": "Chico Buarque & Milton Nascimento",
+    "album": "Construção",
+    "genero": "MPB",
+    "duracao": 212
+  },
+  {
+    "titulo": "O Bêbado e a Equilibrista",
+    "artista": "João Bosco",
+    "album": "Galera",
+    "genero": "MPB",
+    "duracao": 199
+  },
+  {
+    "titulo": "Tocando em Frente",
+    "artista": "Almir Sater & Renato Teixeira",
+    "album": "Almir Sater (single)",
+    "genero": "MPB",
+    "duracao": 254
+  },
+  {
+    "titulo": "Romaria",
+    "artista": "Renato Teixeira",
+    "album": "Romaria (single)",
+    "genero": "MPB",
+    "duracao": 187
+  },
+  {
+    "titulo": "Apesar de Você",
+    "artista": "Chico Buarque",
+    "album": "Chico Buarque (single)",
+    "genero": "MPB",
+    "duracao": 215
+  },
+  {
+    "titulo": "Carolina",
+    "artista": "Chico Buarque",
+    "album": "Chico Buarque (single)",
+    "genero": "MPB",
+    "duracao": 211
+  },
+  {
+    "titulo": "Sampa",
+    "artista": "Caetano Veloso",
+    "album": "Outras Palavras",
+    "genero": "MPB",
+    "duracao": 286
+  },
+  {
+    "titulo": "Gostava Tanto de Você",
+    "artista": "Tim Maia",
+    "album": "Tim Maia",
+    "genero": "MPB",
+    "duracao": 213
+  },
+  {
+    "titulo": "Evidências",
+    "artista": "Chitãozinho & Xororó",
+    "album": "1989",
+    "genero": "Sertanejo",
+    "duracao": 301
+  },
+  {
+    "titulo": "Fio de Cabelo",
+    "artista": "Chitãozinho & Xororó",
+    "album": "1984",
+    "genero": "Sertanejo",
+    "duracao": 245
+  },
+  {
+    "titulo": "Ai Se Eu Te Pego",
+    "artista": "Michel Teló",
+    "album": "Na Balada",
+    "genero": "Sertanejo",
+    "duracao": 176
+  },
+  {
+    "titulo": "Largado às Traças",
+    "artista": "Zé Neto & Cristiano",
+    "album": "Modão - Ao Vivo",
+    "genero": "Sertanejo",
+    "duracao": 238
+  },
+  {
+    "titulo": "Na Conta da Loucura",
+    "artista": "Bruno & Marrone",
+    "album": "Revivem sua História - Ao vivo",
+    "genero": "Sertanejo",
+    "duracao": 165
+  },
+  {
+    "titulo": "Logo eu",
+    "artista": "Jorge & Mateus",
+    "album": "Os Anjos Cantam",
+    "genero": "Sertanejo",
+    "duracao": 155
+  },
+  {
+    "titulo": "Te Esperando",
+    "artista": "Lucas Lucco",
+    "album": "Planos Impossíveis",
+    "genero": "Sertanejo",
+    "duracao": 210
+  },
+  {
+    "titulo": "Você Não Vale Nada",
+    "artista": "Calcinha Preta",
+    "album": "Você Não Vale Nada",
+    "genero": "Sertanejo",
+    "duracao": 201
+  },
+  {
+    "titulo": "Ciumeira",
+    "artista": "Marília Mendonça",
+    "album": "Marília Mendonça - Ao Vivo",
+    "genero": "Sertanejo",
+    "duracao": 205
+  },
+  {
+    "titulo": "De quem é a Culpa?",
+    "artista": "Marília Mendonça",
+    "album": "Realidade",
+    "genero": "Sertanejo",
+    "duracao": 201
+  },
+  {
+    "titulo": "Asa Branca",
+    "artista": "Luiz Gonzaga",
+    "album": "Asa Branca (single)",
+    "genero": "Forro",
+    "duracao": 160
+  },
+  {
+    "titulo": "Eu Só Quero um Xodó",
+    "artista": "Dominguinhos",
+    "album": "Eu Só Quero um Xodó (single)",
+    "genero": "Forro",
+    "duracao": 195
+  },
+  {
+    "titulo": "Anunciação",
+    "artista": "Alceu Valença",
+    "album": "Anjo Avesso",
+    "genero": "Forro",
+    "duracao": 220
+  },
+  {
+    "titulo": "Xote das Meninas",
+    "artista": "Luiz Gonzaga",
+    "album": "Xote das Meninas (single)",
+    "genero": "Forro",
+    "duracao": 175
+  },
+  {
+    "titulo": "Rindo à Toa",
+    "artista": "Falamansa",
+    "album": "Deixa Entrar",
+    "genero": "Forro",
+    "duracao": 185
+  },
+  {
+    "titulo": "Na Base da Chinela",
+    "artista": "Wesley Safadão",
+    "album": "Wesley Safadão (single)",
+    "genero": "Forro",
+    "duracao": 195
+  },
+  {
+    "titulo": "Forro do Xenhenhém",
+    "artista": "Jackson do Pandeiro",
+    "album": "Jackson do Pandeiro (single)",
+    "genero": "Forro",
+    "duracao": 170
+  },
+  {
+    "titulo": "Frevo Mulher",
+    "artista": "Amelinha",
+    "album": "Frevo Mulher",
+    "genero": "Forro",
+    "duracao": 200
+  },
+  {
+    "titulo": "Pagode Russo",
+    "artista": "Dominguinhos",
+    "album": "Dominguinhos ao Vivo",
+    "genero": "Forro",
+    "duracao": 180
+  },
+  {
+    "titulo": "Nem se Despediu de Mim",
+    "artista": "Banda Magníficos",
+    "album": "Nem se Despediu de Mim (single)",
+    "genero": "Forro",
+    "duracao": 210
+  },
+  {
+    "titulo": "Take Me Out",
+    "artista": "Franz Ferdinand",
+    "album": "Franz Ferdinand",
+    "genero": "Indie",
+    "duracao": 217
+  },
+  {
+    "titulo": "Skinny Love",
+    "artista": "Bon Iver",
+    "album": "For Emma, Forever Ago",
+    "genero": "Indie",
+    "duracao": 234
+  },
+  {
+    "titulo": "Electric Feel",
+    "artista": "MGMT",
+    "album": "Oracular Spectacular",
+    "genero": "Indie",
+    "duracao": 223
+  },
+  {
+    "titulo": "1901",
+    "artista": "Phoenix",
+    "album": "Wolfgang Amadeus Phoenix",
+    "genero": "Indie",
+    "duracao": 203
+  },
+  {
+    "titulo": "Fluorescent Adolescent",
+    "artista": "Arctic Monkeys",
+    "album": "Favourite Worst Nightmare",
+    "genero": "Indie",
+    "duracao": 194
+  },
+  {
+    "titulo": "Dog Days Are Over",
+    "artista": "Florence + The Machine",
+    "album": "Lungs",
+    "genero": "Indie",
+    "duracao": 238
+  },
+  {
+    "titulo": "Young Folks",
+    "artista": "Peter Bjorn and John",
+    "album": "Writer's Block",
+    "genero": "Indie",
+    "duracao": 269
+  },
+  {
+    "titulo": "Reptilia",
+    "artista": "The Strokes",
+    "album": "Room on Fire",
+    "genero": "Indie",
+    "duracao": 215
+  },
+  {
+    "titulo": "Lisztomania",
+    "artista": "Phoenix",
+    "album": "Wolfgang Amadeus Phoenix",
+    "genero": "Indie",
+    "duracao": 211
+  },
+  {
+    "titulo": "No One Knows",
+    "artista": "Queens of the Stone Age",
+    "album": "Songs for the Deaf",
+    "genero": "Indie",
+    "duracao": 270
+  },
+  {
+    "titulo": "Deixa Acontecer",
+    "artista": "Grupo Revelação",
+    "album": "Revelação 20 Anos",
+    "genero": "Pagode",
+    "duracao": 220
+  },
+  {
+    "titulo": "Ainda Gosto de Você",
+    "artista": "Exaltasamba",
+    "album": "Exaltasamba 20 Anos",
+    "genero": "Pagode",
+    "duracao": 230
+  },
+  {
+    "titulo": "Me Apaixonei Pela Pessoa Errada",
+    "artista": "Exaltasamba",
+    "album": "Exaltasamba",
+    "genero": "Pagode",
+    "duracao": 250
+  },
+  {
+    "titulo": "Telegrama",
+    "artista": "Zeca Pagodinho",
+    "album": "Telegrama",
+    "genero": "Pagode",
+    "duracao": 190
+  },
+  {
+    "titulo": "Faz Uma Loucura Por Mim",
+    "artista": "Só Pra Contrariar",
+    "album": "Só Pra Contrariar",
+    "genero": "Pagode",
+    "duracao": 210
+  },
+  {
+    "titulo": "Pimpolho",
+    "artista": "Art Popular",
+    "album": "Art Popular",
+    "genero": "Pagode",
+    "duracao": 205
+  },
+  {
+    "titulo": "Essa Tal Liberdade",
+    "artista": "Só Pra Contrariar",
+    "album": "Essa Tal Liberdade",
+    "genero": "Pagode",
+    "duracao": 225
+  },
+  {
+    "titulo": "Do Jeito Que Eu Quero",
+    "artista": "Grupo Raça",
+    "album": "Do Jeito Que Eu Quero",
+    "genero": "Pagode",
+    "duracao": 215
+  },
+  {
+    "titulo": "Vai Vadiar",
+    "artista": "Zeca Pagodinho",
+    "album": "Deixa Acontecer",
+    "genero": "Pagode",
+    "duracao": 200
+  },
+  {
+    "titulo": "Cheia de Manias",
+    "artista": "Raça Negra",
+    "album": "Cheia de Manias",
+    "genero": "Pagode",
+    "duracao": 230
+  }
+
+]

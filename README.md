@@ -29,7 +29,7 @@ Todos os dados, como informações de usuários, execuções (*scrobbles*), esta
 
 ---
 
-## 🚀 Como executar (via Cabal)
+## 🚀 Como executar Haskell (via Cabal)
 
 > Certifique-se de ter o [GHC](https://www.haskell.org/ghc/) e o [Cabal](https://www.haskell.org/cabal/) instalados.
 
@@ -41,6 +41,19 @@ cabal build
 
 # 3. Execute o projeto
 cabal run
+
+## 🚀 Como executar Prolog (via SWI-Prolog)
+
+> Certifique-se de ter o SWI-Prolog (https://www.swi-prolog.org/Download.html) instalado.
+
+# 1. Navegue até o diretório 'main'
+cd astfm.plp\prolog\main
+
+# 2. Inicie o inerpretador no SWI-Prolog
+swipl
+
+# 3. Execute o projeto
+? - [main].
 
 ---
 

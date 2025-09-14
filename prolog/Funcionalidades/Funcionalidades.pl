@@ -1,17 +1,32 @@
+:- module(funcionalidades, [
+    carregar_usuarios_json/0,
+    carregar_musicas/1,
+    carregar_scrobbles/1,
+    cadastrar_usuario/3,
+    login/3,
+    estatisticas_globais/0,
+    gerar_ranking_global/0,
+    gerar_ranking_pessoal/1,
+    ver_conquistas/1,
+    registrar_scrobble/2,
+    recomendar_musicas/4,
+    escolher_genero/1,
+    listar_musicas/2,
+    usuario_para_dict/2
+]).
+
 :- dynamic usuario/4.
 :- use_module(library(http/json)).
 :- use_module(library(date)).
-:- consult('Conquistas.pl').
-:- discontiguous scrobble_do_usuario/2.
-:- discontiguous compare_scrobbles/3.
 :- use_module(library(apply)).
-:- ['../catalogo.pl'].
 
+% Fatos do catálogo (sem módulo): garante carregamento
+:- ensure_loaded('../catalogo.pl').
+:- ensure_loaded('Conquistas.pl').
 
 % --------------------- Caminhos dos arquivos JSON ---------------------
 
 caminho_usuarios('../usuarios.json').
-caminho_musicas('../catalogo.pl').
 caminho_scrobbles('../scrobbles.json').
 
 % --------------------- Validações ---------------------
@@ -24,8 +39,40 @@ valid_email(Email) :-
     string(Email),
     re_match("^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$", Email).
 
-% --------------------- Usuários ---------------------
+% --------------------- Helpers de conversão/normalização ---------------------
 
+valor_para_string(V, S) :-
+    ( string(V) -> S = V
+    ; atom(V)   -> atom_string(V, S)
+    ; number(V) -> number_string(V, S)
+    ; S = ""
+    ).
+
+padronizar_texto(Texto, Padrao) :-
+    ( atom(Texto) -> atom_string(Texto, TextoStr) ; TextoStr = Texto ),
+    split_string(TextoStr, "\n\r\t ", "\n\r\t ", Parts),
+    atomics_to_string(Parts, " ", SemEspacos),
+    string_lower(SemEspacos, Padrao).
+
+titulo_normalizado(MusicaDict, TNorm) :-
+    ( get_dict(titulo, MusicaDict, T0) -> valor_para_string(T0, TS) ; TS = "" ),
+    padronizar_texto(TS, TNorm).
+
+ja_ouviu(TitulosOuvidosNorm, MusicaDict) :-
+    titulo_normalizado(MusicaDict, TNorm),
+    member(TNorm, TitulosOuvidosNorm).
+
+extrair_titulos_ouvidos(Historico, TitulosNormUnicos) :-
+    findall(TNorm, (
+        member(S, Historico),
+        get_dict(musica, S, M),
+        get_dict(titulo, M, T0),
+        valor_para_string(T0, TS),
+        padronizar_texto(TS, TNorm)
+    ), Ts),
+    list_to_set(Ts, TitulosNormUnicos).
+
+% --------------------- Usuários ---------------------
 
 salvar_usuarios_json :-
     caminho_usuarios(File),
@@ -40,23 +87,21 @@ salvar_usuarios_json :-
 
 carregar_usuarios_json :-
     caminho_usuarios(File),
-    ( exists_file(File) ->
-        open(File, read, Stream),
+    (   exists_file(File)
+    ->  open(File, read, Stream),
         json_read_dict(Stream, UsuariosJSON),
         close(Stream),
         retractall(usuario(_, _, _, _)),
         carregar_lista_usuarios(UsuariosJSON)
-    ; true
+    ;   true
     ).
 
 carregar_lista_usuarios([]).
-carregar_lista_usuarios([Elem | T]) :-
-    % Elem pode ser dict ou json(...) — vamos normalizar
-    (   Elem = json(AssocList) -> dict_create(Dict, _, AssocList)
-    ;   Elem = Dict  % já é dict
+carregar_lista_usuarios([Elem|T]) :-
+    (   Elem = json(Assoc) -> dict_create(Dict, _, Assoc)
+    ;   Dict = Elem
     ),
-    % extraímos campos
-    Nome = Dict.nome,
+    Nome  = Dict.nome,
     Email = Dict.email,
     Senha = Dict.senha,
     ( var(Dict.conquistas) ; Dict.conquistas == null -> Conqs = [] ; Conqs = Dict.conquistas ),
@@ -74,14 +119,10 @@ cadastrar_usuario(Nome, Email, Senha) :-
     assertz(usuario(Nome, Email, Senha, [])),
     salvar_usuarios_json,
     writeln('Usuário cadastrado com sucesso!').
-
 cadastrar_usuario(Nome, Email, _) :-
-    ( \+ valid_usuario(Nome) ->
-        writeln('Nome inválido: deve conter apenas letras e espaços')
-    ; \+ valid_email(Email) ->
-        writeln('Email inválido. Tente novamente.')
-    ; usuario(_, Email, _, _) ->
-        writeln('Já existe um usuário com esse email!')
+    ( \+ valid_usuario(Nome) -> writeln('Nome inválido: deve conter apenas letras e espaços')
+    ; \+ valid_email(Email)   -> writeln('Email inválido. Tente novamente.')
+    ; usuario(_, Email, _, _) -> writeln('Já existe um usuário com esse email!')
     ).
 
 login(EmailInput, SenhaInput, usuario{nome:Nome, email:Email}) :-
@@ -91,23 +132,14 @@ login(EmailInput, SenhaInput, usuario{nome:Nome, email:Email}) :-
     EmailLower == EmailInputLower,
     SenhaInput == Senha.
 
-
-
-% --------------------- Músicas ---------------------
+% --------------------- Músicas (a partir dos fatos musica/5 do catálogo) ---------------------
 
 carregar_musicas(MusicasDict) :-
     findall(
-        musica{
-            titulo: Titulo,
-            artista: Artista,
-            album: Album,
-            genero: Genero,
-            duracao: Duracao
-        },
-        musica(Titulo, Artista, Album, Genero, Duracao),
+        musica{titulo:T, artista:A, album:Al, genero:G, duracao:D},
+        musica(T, A, Al, G, D),
         MusicasDict
     ).
-
 
 converter_json_para_dicts([], []).
 converter_json_para_dicts([json(Obj)|T], [Dict|DT]) :-
@@ -125,60 +157,43 @@ listar_musicas([M|Ms], N) :-
 carregar_scrobbles(Scrobbles) :-
     caminho_scrobbles(File),
     ( exists_file(File) ->
-        catch(
-            ( open(File, read, Stream),
-              json_read(Stream, JSON),
-              close(Stream),
-              converter_scrobbles(JSON, Scrobbles)
-            ),
-            _Erro,
-            Scrobbles = []
-        )
+        catch( ( open(File, read, Stream),
+                 json_read(Stream, JSON),
+                 close(Stream),
+                 converter_scrobbles(JSON, Scrobbles)
+               ),
+               _, Scrobbles = [] )
     ; Scrobbles = []
     ).
 
-
 converter_scrobbles([], []).
-converter_scrobbles([json(Obj)|T], [NovoDict|ST]) :-
+converter_scrobbles([json(Obj)|T], [Novo|ST]) :-
     dict_create(Dict, _, Obj),
-    ( get_dict(musica, Dict, MusicaData) ->
-        ( MusicaData = json(MusicaAssoc) ->
-            dict_create(MusicaDict, _, MusicaAssoc)
-        ; MusicaData = MusicaDict  % já é um dict
-        ),
-        put_dict(musica, Dict, MusicaDict, NovoDict)
-    ; NovoDict = Dict
+    (   get_dict(musica, Dict, M0)
+    ->  ( M0 = json(MA) -> dict_create(M, _, MA) ; M = M0 ),
+        put_dict(musica, Dict, M, Novo)
+    ;   Novo = Dict
     ),
     converter_scrobbles(T, ST).
 
-
-
-listar_scrobbles_usuario(Scrobbles) :-
-    listar_scrobbles_usuario(Scrobbles, 1).
-
+listar_scrobbles_usuario(Scrobbles) :- listar_scrobbles_usuario(Scrobbles, 1).
 listar_scrobbles_usuario([], _).
 listar_scrobbles_usuario([S|Ss], N) :-
     format('  ~d. ~w - ~w | ~w~n', [N, S.musica.titulo, S.musica.artista, S.momento]),
     N1 is N + 1,
     listar_scrobbles_usuario(Ss, N1).
 
-
 registrar_scrobble(EmailUsuario, MusicaDict) :-
-    get_time(TimeStamp),
-    stamp_date_time(TimeStamp, DateTime, local),
-    format_time(atom(Momento), '%Y-%m-%d %H:%M:%S', DateTime),
-    Scrobble = scrobble{
-        emailUsuario: EmailUsuario,
-        momento: Momento,
-        musica: MusicaDict
-    },
-    salvar_scrobble(Scrobble),
+    get_time(TS),
+    stamp_date_time(TS, DT, local),
+    format_time(atom(Momento), '%Y-%m-%d %H:%M:%S', DT),
+    Sc = scrobble{ emailUsuario:EmailUsuario, momento:Momento, musica:MusicaDict },
+    salvar_scrobble(Sc),
     verificar_e_aplicar_conquistas(EmailUsuario).
 
-
-salvar_scrobble(NovoScrobble) :-
-    carregar_scrobbles(Scrobbles),
-    append(Scrobbles, [NovoScrobble], Todos),
+salvar_scrobble(Novo) :-
+    carregar_scrobbles(Scs),
+    append(Scs, [Novo], Todos),
     salvar_scrobbles_json(Todos).
 
 salvar_scrobbles_json(Scrobbles) :-
@@ -188,495 +203,338 @@ salvar_scrobbles_json(Scrobbles) :-
     json_write_dict(Stream, JSONList),
     close(Stream).
 
-scrobble_para_json(ScrobbleDict, json([
-    emailUsuario=ScrobbleDict.emailUsuario,
-    momento=ScrobbleDict.momento,
-    musica=ScrobbleDict.musica
-])).
+scrobble_para_json(Sc, json([emailUsuario=Sc.emailUsuario, momento=Sc.momento, musica=Sc.musica])).
 
 % --------------------- Conquistas ---------------------
 
 ver_conquistas(Email) :-
     usuario(_, Email, _, Conqs),
-    ( Conqs = [] ->
-        writeln('Você ainda não possui conquistas.')
-    ;
-        forall(member(C, Conqs), format('- ~w~n', [C]))
+    ( Conqs == [] -> writeln('Você ainda não possui conquistas.')
+    ; forall(member(C, Conqs), format('- ~w~n', [C]))
     ), !.
-ver_conquistas(_) :-
-    writeln('Usuário não encontrado.').
+ver_conquistas(_) :- writeln('Usuário não encontrado.').
 
 adicionar_conquista(Email, Conquista) :-
     usuario(Nome, Email, Senha, Conqs),
     ( member(Conquista, Conqs) ->
         writeln('Usuário já possui essa conquista.')
-    ;
-        retract(usuario(Nome, Email, Senha, Conqs)),
-        assertz(usuario(Nome, Email, Senha, [Conquista|Conqs])),
-        salvar_usuarios_json,
-        writeln('Nova conquista desbloqueada!')
+    ; retract(usuario(Nome, Email, Senha, Conqs)),
+      assertz(usuario(Nome, Email, Senha, [Conquista|Conqs])),
+      salvar_usuarios_json,
+      writeln('Nova conquista desbloqueada!')
     ), !.
-adicionar_conquista(_, _) :-
-    writeln('Usuário não encontrado.').
+adicionar_conquista(_, _) :- writeln('Usuário não encontrado.').
 
 verificar_e_aplicar_conquistas(EmailUsuario) :-
-    carregar_scrobbles(Scrobbles),
-    findall(Conquista,
-        (conquista(Scrobbles, EmailUsuario, Conquista),
-         \+ ja_tem_conquista(EmailUsuario, Conquista)
+    carregar_scrobbles(Scs),
+    findall(C,
+        ( conquista(Scs, EmailUsuario, C),
+          \+ ja_tem_conquista(EmailUsuario, C)
         ),
         Novas),
-    forall(member(C, Novas), adicionar_conquista(EmailUsuario, C)).
+    forall(member(X, Novas), adicionar_conquista(EmailUsuario, X)).
 
-ja_tem_conquista(Email, Conquista) :-
+ja_tem_conquista(Email, C) :-
     usuario(_, Email, _, Conqs),
-    member(Conquista, Conqs).
-
+    member(C, Conqs).
 
 % --------------------- Estatísticas ---------------------
 
-tempo_total_usuario(Scrobbles, usuario(_, Email, _, _), Total) :-
-    include(
-        {Email}/[S]>>(
-            get_dict(emailUsuario, S, EmailS),
-            atom_string(EmailS, Email)
-        ),
-        Scrobbles,
-        ScrobblesUsuario
-    ),
-    findall(Dur,
-        ( member(S, ScrobblesUsuario),
-          get_dict(musica, S, Musica),
-          ( get_dict(duracao, Musica, Dur) -> true ; Dur = 0 )
-        ),
-        Duracoes),
-    sum_list(Duracoes, Total).
-
-
+tempo_total_usuario(Scs, usuario(_, Email, _, _), Total) :-
+    include({Email}/[S]>>(get_dict(emailUsuario, S, E), atom_string(E, Email)), Scs, ScsU),
+    findall(Dur, (member(S, ScsU), get_dict(musica, S, M), (get_dict(duracao, M, Dur) -> true ; Dur = 0)), Ds),
+    sum_list(Ds, Total).
 
 estatisticas_globais :-
     carregar_usuarios(Usuarios),
-    carregar_scrobbles(Scrobbles),
-    ( Scrobbles == [] ->
+    carregar_scrobbles(Scs),
+    ( Scs == [] ->
         writeln('\nNenhum dado disponível para estatísticas globais ainda.')
-    ;
-        findall(Artista, (member(S, Scrobbles), get_artista(S, Artista)), ListaArtistas),
-        max_por_frequencia(ListaArtistas, ArtistaTop, CountArt),
+    ; findall(Art, (member(S, Scs), get_artista(S, Art)), Arts),
+      max_por_frequencia(Arts, ArtTop, CArt),
+      findall((T, A), (member(S, Scs), get_musica(S, T, A)), Mus),
+      max_por_frequencia(Mus, (TT, AT), CMus),
 
-        findall((Titulo, Artista), (member(S, Scrobbles), get_musica(S, Titulo, Artista)), ListaMusicas),
-        max_por_frequencia(ListaMusicas, (TituloTop, ArtistaTopMus), CountMus),
+      include({Scs}/[U]>>tem_scrobble(Scs, U), Usuarios, UsComSc),
+      findall(TTt, (member(U, UsComSc), tempo_total_usuario(Scs, U, TTt)), Ts),
+      length(Ts, Q),
+      ( Q > 0 -> sum_list(Ts, Soma), TM is Soma / Q ; TM = 0 ),
+      format_tempo(TM, F),
 
-        include(
-            {Scrobbles}/[Usuario]>>tem_scrobble(Scrobbles, Usuario),
-            Usuarios,
-            UsuariosComScrobbles
-        ),
-
-        findall(
-            TempoTotal,
-            (member(U, UsuariosComScrobbles), tempo_total_usuario(Scrobbles, U, TempoTotal)),
-            TemposTotaisUsuarios
-        ),
-
-        length(TemposTotaisUsuarios, QtdUsuarios),
-
-         ( QtdUsuarios > 0 ->
-           sum_list(TemposTotaisUsuarios, SomaTempos),
-           TempoMedio is SomaTempos / QtdUsuarios
-        ; TempoMedio = 0
-        ),
-
-
-        format_tempo(TempoMedio, TempoFormatado),
-
-        format('\nEstatísticas Globais da Plataforma:\n'),
-        format('  Artista mais ouvido: ~w (~d scrobble(s))\n', [ArtistaTop, CountArt]),
-        format('  Música mais ouvida: ~w - ~w (~d scrobble(s))\n', [TituloTop, ArtistaTopMus, CountMus]),
-        format('  Tempo médio de escuta por usuário: ~w\n', [TempoFormatado])
+      format('\nEstatísticas Globais da Plataforma:\n'),
+      format('  Artista mais ouvido: ~w (~d scrobble(s))\n', [ArtTop, CArt]),
+      format('  Música mais ouvida: ~w - ~w (~d scrobble(s))\n', [TT, AT, CMus]),
+      format('  Tempo médio de escuta por usuário: ~w\n', [F])
     ).
 
-gerar_ranking_pessoal(UsuarioEmail) :-
-    carregar_scrobbles(Scrobbles),
-    
-    % Filtra scrobbles do usuário corretamente:
-    findall(MusicaDict,
-            (member(Scrobble, Scrobbles),
-             get_dict(emailUsuario, Scrobble, Email),
-             string_lower(Email, EL),
-             string_lower(UsuarioEmail, UL),
-             EL == UL,
-             get_dict(musica, Scrobble, MusicaDict)),
-            MusicasOuvidasDicts),
-    
-    ( MusicasOuvidasDicts == [] ->
+gerar_ranking_pessoal(EmailU) :-
+    carregar_scrobbles(Scs),
+    findall(MD,
+        ( member(S, Scs),
+          get_dict(emailUsuario, S, E), string_lower(E, EL),
+          string_lower(EmailU, UL), EL == UL,
+          get_dict(musica, S, MD)
+        ),
+        MsDict),
+    ( MsDict == [] ->
         writeln('Você ainda não tem nenhum scrobble :( Que tal dar play em alguma música? ;)')
-    ; 
-    
-        maplist(dict_para_musica_termo, MusicasOuvidasDicts, MusicasOuvidas),
-        
-        contar_frequencias(MusicasOuvidas, ContagemMusicas),
-        ordenar_por_valor_decrescente(ContagemMusicas, RankMusicas),
-
-        findall(Genero, (member(musica(_, _, Genero), MusicasOuvidas)), Generos),
-        contar_frequencias(Generos, ContagemGeneros),
-        ordenar_por_valor_decrescente(ContagemGeneros, RankGeneros),
-
-        writeln('\nRanking das suas músicas mais escutadas! Veja seus hits do momento:'),
-        imprimir_rank_musicas(RankMusicas),
-
-        writeln('\nRanking dos gêneros mais ouvidos:'),
-        imprimir_rank_generos(RankGeneros)
+    ; maplist(dict_para_musica_termo, MsDict, Ms),
+      contar_frequencias(Ms, CMs), ordenar_por_valor_decrescente(CMs, RankM),
+      findall(G, (member(musica(_, _, G), Ms)), Gens),
+      contar_frequencias(Gens, CGs), ordenar_por_valor_decrescente(CGs, RankG),
+      writeln('\nRanking das suas músicas mais escutadas! Veja seus hits do momento:'),
+      imprimir_rank_musicas(RankM),
+      writeln('\nRanking dos gêneros mais ouvidos:'),
+      imprimir_rank_generos(RankG)
     ).
 
-dict_para_musica_termo(Dict, musica(TituloS, ArtistaS, GeneroS)) :-
-    dict_field_to_string(Dict.titulo, TituloS),
-    dict_field_to_string(Dict.artista, ArtistaS),
-    dict_field_to_string(Dict.genero, GeneroS).
-
-dict_field_to_string(Value, Str) :-
-    (   string(Value) -> Str = Value
-    ;   atom(Value)   -> atom_string(Value, Str)
-    ;   number(Value) -> number_string(Value, Str)
-    ;   Str = ""  % fallback
-    ).
-
-
-musica_genero(musica(_, _, Genero), Genero).
-
+dict_para_musica_termo(D, musica(TS, AS, GS)) :-
+    valor_para_string(D.titulo, TS),
+    valor_para_string(D.artista, AS),
+    valor_para_string(D.genero,  GS).
 
 contar_frequencias(Lista, Contagem) :-
-    setof((X, N), 
-          aggregate(count, member(X, Lista), N), 
-          Contagem).
-
-
-incrementa_ou_adiciona(X, [], [(X,1)]) :-
-    format("Adicionando nova música: ~w~n", [X]).
-
-incrementa_ou_adiciona(X, [(Y,N)|T], [(Y,N1)|T]) :-
-    X == Y,
-    N1 is N + 1,
-    format("Incrementando contagem de música: ~w (de ~d para ~d)~n", [X, N, N1]).
-
-incrementa_ou_adiciona(X, [H|T], [H|NT]) :-
-    H = (Y,_),
-    X \== Y,
-    incrementa_ou_adiciona(X, T, NT).
+    setof((X,N), aggregate(count, member(X, Lista), N), Contagem).
 
 ordenar_por_valor_decrescente(Lista, Ordenada) :-
     predsort(compara_valor_decrescente, Lista, Ordenada).
 
-compara_valor_decrescente(Delta, (X, V1), (Y, V2)) :-
+compara_valor_decrescente(Delta, (X,V1), (Y,V2)) :-
     ( V1 > V2 -> Delta = '<'
     ; V1 < V2 -> Delta = '>'
-    ; 
-      % Se valores iguais, compara os nomes (se for musica, compara título; se for átomo/string, compara diretamente)
-      compara_empate(X, Y, Delta)
+    ; compara_empate(X, Y, Delta)
     ).
 
-compara_empate(musica(T1, _, _), musica(T2, _, _), Delta) :-
-    compare(Delta, T1, T2).
-
-compara_empate(X, Y, Delta) :-
-    % Caso X e Y não sejam musica(...), compara diretamente
-    compare(Delta, X, Y).
-
-
+compara_empate(musica(T1,_,_), musica(T2,_,_), Delta) :- compare(Delta, T1, T2).
+compara_empate(X, Y, Delta) :- compare(Delta, X, Y).
 
 imprimir_rank_musicas([]).
-imprimir_rank_musicas([(musica(Titulo, Artista, _), Qnt)|T]) :-
-    format('~w - ~w | Ouvidas: ~d~n', [Titulo, Artista, Qnt]),
-    imprimir_rank_musicas(T).
-
+imprimir_rank_musicas([(musica(T,A,_), Q)|R]) :-
+    format('~w - ~w | Ouvidas: ~d~n', [T, A, Q]),
+    imprimir_rank_musicas(R).
 
 imprimir_rank_generos([]).
-imprimir_rank_generos([(Genero, Qnt)|T]) :-
-    format('~w | Ouvidas: ~d~n', [Genero, Qnt]),
-    imprimir_rank_generos(T).
-
+imprimir_rank_generos([(G, Q)|R]) :-
+    format('~w | Ouvidas: ~d~n', [G, Q]),
+    imprimir_rank_generos(R).
 
 gerar_ranking_global :-
     carregar_usuarios(Usuarios),
-    carregar_scrobbles(Scrobbles),
-    (   Usuarios == [] ->
+    carregar_scrobbles(Scs),
+    ( Usuarios == [] ->
         writeln('\nNenhum usuário cadastrado ainda. Que tal ser o primeiro a se juntar ao LastFM? :)')
-    ;   findall(Stats, (
-            member(usuario(Nome, Email, _, _), Usuarios),
-            include(scrobble_do_usuario(Email), Scrobbles, ScsU),
-            length(ScsU, QtdScrobbles),
-            Stats = stat{nome: Nome, email: Email, scrobbles: QtdScrobbles}
-        ), ListaStats),
-        predsort(compare_scrobbles, ListaStats, Ranking),
-        writeln('\n========= RANKING GLOBAL =========='),
-        imprime_rank_global(Ranking)
+    ; findall(Stat,
+        ( member(usuario(N, E, _, _), Usuarios),
+          include(scrobble_do_usuario(E), Scs, ScsU),
+          length(ScsU, Qtd),
+          Stat = stat{nome:N, email:E, scrobbles:Qtd}
+        ),
+        ListaStats),
+      predsort(compare_scrobbles, ListaStats, Ranking),
+      writeln('\n========= RANKING GLOBAL =========='), imprime_rank_global(Ranking)
     ).
 
-scrobble_do_usuario(Email, Scrobble) :-
-    get_dict(emailUsuario, Scrobble, EmailScrobble0),
-    (atom(EmailScrobble0) -> atom_string(EmailScrobble0, EmailScrobble) ; EmailScrobble = EmailScrobble0),
-    (atom(Email) -> atom_string(Email, EmailStr) ; EmailStr = Email),
-    string_lower(EmailStr, Lower1),
-    string_lower(EmailScrobble, Lower2),
-    Lower1 == Lower2.
+scrobble_do_usuario(Email, Sc) :-
+    get_dict(emailUsuario, Sc, E0),
+    ( atom(E0) -> atom_string(E0, E) ; E = E0 ),
+    ( atom(Email) -> atom_string(Email, ES) ; ES = Email ),
+    string_lower(ES, L1), string_lower(E, L2), L1 == L2.
 
-
-compare_scrobbles(Order, A, B) :-
-    A.scrobbles >= B.scrobbles -> Order = (<) ; Order = (>).
+compare_scrobbles(>, A, B) :- A.scrobbles >  B.scrobbles.
+compare_scrobbles(<, A, B) :- A.scrobbles <  B.scrobbles.
+compare_scrobbles(=, _, _).
 
 imprime_rank_global([], _).
-imprime_rank_global([Stat | T], Pos) :-
-    format('~d. ~w (~w) - ~d scrobble(s)~n', [Pos, Stat.nome, Stat.email, Stat.scrobbles]),
+imprime_rank_global([S|T], Pos) :-
+    format('~d. ~w (~w) - ~d scrobble(s)~n', [Pos, S.nome, S.email, S.scrobbles]),
     Pos1 is Pos + 1,
     imprime_rank_global(T, Pos1).
-imprime_rank_global(Ranking) :-
-    imprime_rank_global(Ranking, 1).
+imprime_rank_global(R) :- imprime_rank_global(R, 1).
 
 verificar_compatibilidade(U1, U2) :-
-    verificar_compatibilidade(U1, U2, Compat),
-    Porcentagem is Compat * 100,
-    format('Compatibilidade entre ~w e ~w: ~2f%%~n', [U1.email, U2.email, Porcentagem]).
+    verificar_compatibilidade(U1, U2, C),
+    P is C * 100,
+    format('Compatibilidade entre ~w e ~w: ~2f%%~n', [U1.email, U2.email, P]).
 
 verificar_compatibilidade(U1, U2, Compatibilidade) :-
-    carregar_scrobbles(Scrobbles),
-    include(scrobble_do_usuario(U1.email), Scrobbles, ScsU1),
-    include(scrobble_do_usuario(U2.email), Scrobbles, ScsU2),
-    findall(G, (member(S, ScsU1), G = S.musica.genero), Gs1), list_to_set(Gs1, SetG1),
-    findall(A, (member(S, ScsU1), A = S.musica.artista), As1), list_to_set(As1, SetA1),
-    findall(G, (member(S, ScsU2), G = S.musica.genero), Gs2), list_to_set(Gs2, SetG2),
-    findall(A, (member(S, ScsU2), A = S.musica.artista), As2), list_to_set(As2, SetA2),
-    intersection(SetG1, SetG2, ComunsG), length(ComunsG, LComunsG),
-    intersection(SetA1, SetA2, ComunsA), length(ComunsA, LComunsA),
-    ( length(SetG1, LSetG1), LSetG1 > 0 -> CompG is LComunsG / LSetG1 ; CompG = 0 ),
-    ( length(SetA1, LSetA1), LSetA1 > 0 -> CompA is LComunsA / LSetA1 ; CompA = 0 ),
+    carregar_scrobbles(Scs),
+    include(scrobble_do_usuario(U1.email), Scs, S1),
+    include(scrobble_do_usuario(U2.email), Scs, S2),
+    findall(G, (member(S, S1), G = S.musica.genero), Gs1), list_to_set(Gs1, SG1),
+    findall(A, (member(S, S1), A = S.musica.artista), As1), list_to_set(As1, SA1),
+    findall(G, (member(S, S2), G = S.musica.genero), Gs2), list_to_set(Gs2, SG2),
+    findall(A, (member(S, S2), A = S.musica.artista), As2), list_to_set(As2, SA2),
+    intersection(SG1, SG2, ComG), length(ComG, LG),
+    intersection(SA1, SA2, ComA), length(ComA, LA),
+    ( length(SG1, LG1), LG1 > 0 -> CompG is LG / LG1 ; CompG = 0 ),
+    ( length(SA1, LA1), LA1 > 0 -> CompA is LA / LA1 ; CompA = 0 ),
     Compatibilidade is (CompG * 0.6) + (CompA * 0.4).
 
-
-genero_mais_ouvido(Email, GeneroMais) :-
-    carregar_scrobbles(Scrobbles),
-    include(scrobble_do_usuario(Email), Scrobbles, Historico),
-    findall(Genero, (
-        member(scrobble(_, Musica), Historico),
-        get_dict(genero, Musica, Genero)
-    ), Generos),
-    mapeia_contagem(Generos, Contagens),
-    sort(2, @>=, Contagens, [GeneroMais-_|_]) -> true ; GeneroMais = none.
-
-mapeia_contagem(Lista, Contagens) :-
-    msort(Lista, Ordenada),
-    encode_freq(Ordenada, Contagens).
-
-encode_freq([], []).
-encode_freq([H|T], [H-N|R]) :-
-    conta(H, T, N1, Restante),
-    N is N1 + 1,
-    encode_freq(Restante, R).
-
-conta(_, [], 0, []).
-conta(X, [X|T], N, Restante) :-
-    conta(X, T, N1, Restante),
-    N is N1 + 1.
-conta(X, [Y|T], 0, [Y|T]) :-
-    dif(X, Y).
-
-
-filtrar_nao_ouvidas(Musicas, TitulosOuvidos, NaoOuvidas) :-
-    exclude([Musica]>>ja_ouviu(TitulosOuvidos, Musica), Musicas, NaoOuvidas).
-
-ja_ouviu(TitulosOuvidos, Musica) :-
-    get_dict(titulo, Musica, Titulo),
-    member(Titulo, TitulosOuvidos).
-
-
-
-% --------------------- RECOMENDAÇÕES ----------------------------
-
-filtra_genero_nao_ouvidas(GeneroStr, TitulosOuvidos, MusicaDict) :-
-    musica_tem_genero(GeneroStr, MusicaDict),
-    \+ ja_ouviu(TitulosOuvidos, MusicaDict).
-
-filtra_artista_nao_ouvidas(ArtistaStr, TitulosOuvidos, MusicaDict) :-
-    musica_tem_artista(ArtistaStr, MusicaDict),
-    \+ ja_ouviu(TitulosOuvidos, MusicaDict).
-
-filtra_generos_ouvidos_nao_ouvidas(GenerosUnicos, TitulosOuvidos, MusicaDict) :-
-    get_dict(genero, MusicaDict, GeneroMusica),
-    member(GeneroMusica, GenerosUnicos),
-    \+ ja_ouviu(TitulosOuvidos, MusicaDict).
-
-
-recomendar_musicas(_Usuario, "1", Genero, MusicasRecomendadas) :-
-    carregar_musicas(TodasMusicas),
-    % AQUI: Usando o predicado correto
-    include(musica_tem_genero(Genero), TodasMusicas, Candidatas),
-    length(Candidatas, L),
-    N is min(3, L),
-    sublist(Candidatas, N, MusicasRecomendadas).
-
-recomendar_musicas(_Usuario, "2", Artista, MusicasRecomendadas) :-
-    carregar_musicas(TodasMusicas),
-    include(musica_tem_artista(Artista), TodasMusicas, Candidatas),
-    length(Candidatas, L),
-    N is min(3, L),
-    sublist(Candidatas, N, MusicasRecomendadas).
-
-
-recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
-    carregar_musicas(TodasAsMusicas),
-    carregar_scrobbles(TodosScrobbles),
-
-    include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
-
-    generos_mais_ouvidos(HistoricoUsuario, GenerosOrdenados),
-    extrair_titulos_ouvidos(HistoricoUsuario, TitulosOuvidos),
-
-    include(
-        eh_musica_mais_ouvida_genero(TitulosOuvidos, GenerosOrdenados),
-        TodasAsMusicas,
-        Candidatas
-    ),
-
-    length(Candidatas, L),
-    N is min(3, L),
-    sublist(Candidatas, N, MusicasRecomendadas).
- 
-
-extrair_titulos_ouvidos(Historico, Titulos) :-
-    findall(TituloLower, (
-        member(S, Historico),
-        get_dict(musica, S, M),
-        get_dict(titulo, M, Titulo),
-        atom_string(Titulo, TStr),
-        string_lower(TStr, TituloLower)
-    ), TitulosList),
-    list_to_set(TitulosList, Titulos).
-
-eh_musica_mais_ouvida_genero(TitulosOuvidos, GenerosPreferidos, Musica) :-
-    get_dict(titulo, Musica, T),
-    atom_string(T, TStr),
-    string_lower(TStr, TLower),
-    \+ member(TLower, TitulosOuvidos),
-
-    get_dict(genero, Musica, G),
-    atom_string(G, GStr),
-    string_lower(GStr, GLower),
-    member(GLower, GenerosPreferidos).
-
-extrair_titulos_e_generos_do_historico(Historico, Titulos, Generos) :-
-    findall(MusicaDict, (
-        member(S, Historico),
-        get_dict(musica, S, MusicaDict)
-    ), MusicasOuvidasDict),
-
-    findall(TituloLower, (
-        member(M_dict, MusicasOuvidasDict),
-        get_dict(titulo, M_dict, Titulo),
-        atom_string(TituloAtom, Titulo),
-        string_lower(TituloAtom, TituloLower)
-    ), TitulosUnicos),
-
-    findall(GeneroLower, (
-        member(M_dict, MusicasOuvidasDict),
-        get_dict(genero, M_dict, Genero),
-        atom_string(GeneroAtom, Genero),
-        string_lower(GeneroAtom, GeneroLower)
-    ), GenerosUnicosList),
-
-    list_to_set(TitulosUnicos, Titulos),
-    list_to_set(GenerosUnicosList, Generos).
-
-eh_musica_recomendada(TitulosOuvidos, GenerosOuvidos, Musica) :-
-    get_dict(genero, Musica, Genero),
-    atom_string(GeneroAtom, Genero),
-    string_lower(GeneroAtom, GeneroLower),
-    member(GeneroLower, GenerosOuvidos),
-
-    get_dict(titulo, Musica, Titulo),
-    atom_string(TituloAtom, Titulo),
-    string_lower(TituloAtom, TituloLower),
-    \+ member(TituloLower, TitulosOuvidos).
+% ---------- GÊNEROS MAIS OUVIDOS (para recomendação baseada no histórico) ----------
 
 generos_mais_ouvidos(Historico, GenerosOrdenados) :-
-    findall(GeneroLower, (
+    findall(GLower, (
         member(S, Historico),
-        get_dict(musica, S, MusicaDict),
-        get_dict(genero, MusicaDict, Genero),
-        (atom(Genero) -> atom_string(Genero, GeneroStr) ; GeneroStr = Genero),
-        string_lower(GeneroStr, GeneroLower)
+        get_dict(musica, S, M),
+        get_dict(genero, M, G0),
+        valor_para_string(G0, GS),
+        string_lower(GS, GLower)
     ), Generos),
+    sort(Generos, Unicos),
+    findall(Freq-Genero, (member(Genero, Unicos), count_occurrences(Genero, Generos, Freq)), Pares),
+    sort(1, @>=, Pares, Ordenadas),
+    pairs_values(Ordenadas, GenerosOrdenados).
 
-    sort(Generos, GenerosUnicos),
-    findall(Freq-Genero,
-        (member(Genero, GenerosUnicos), count_occurrences(Genero, Generos, Freq)),
-        Frequencias),
+count_occurrences(Elem, Lista, C) :- include(==(Elem), Lista, L), length(L, C).
 
-    sort(1, @>=, Frequencias, Ordenadas),  
-    pairs_values(Ordenadas, GenerosOrdenados).  
-
-count_occurrences(Elem, Lista, Count) :-
-    include(==(Elem), Lista, Filtrada),
-    length(Filtrada, Count).
-
-
-
-musica_do_genero(Genero, Musica) :-
-    get_dict(genero, Musica, Genero).
-
-musica_do_artista(Artista, Musica) :-
-    get_dict(artista, Musica, Artista).
-
-
-sublist_aleatoria(Lista, N, Sublist) :-
-    random_permutation(Lista, PermutedList),
-    sublist(PermutedList, N, Sublist).
-
-
-sublist(List, N, Sublist) :-
-    length(Sublist, N),
-    append(Sublist, _, List).
-
-musica_ouvida_pelo_usuario(musica(T, A, Al, G, D), Historico) :-
-    member(musica(T, A, Al, G, D), Historico).
-
-
-genero_string_atom(String, Atom) :- atom_string(Atom, String).
-
-padronizar_texto(Texto, Padrao) :-
-    ( atom(Texto) -> atom_string(Texto, TextoStr) ; TextoStr = Texto ),   
-    split_string(TextoStr, "\n\r\t ", "\n\r\t ", Parts),
-    atomics_to_string(Parts, "", SemEspacos),
-    string_lower(SemEspacos, Padrao).
-
-
+% ---------- Filtros de catálogo (gênero/artista com normalização) ----------
 
 musica_tem_genero(GeneroDesejado, Musica) :-
-    get_dict(genero, Musica, GeneroMusica),
-    padronizar_texto(GeneroMusica, GNorm1),
-    padronizar_texto(GeneroDesejado, GNorm2),
-    GNorm1 == GNorm2.
+    get_dict(genero, Musica, Gm),
+    padronizar_texto(Gm, G1),
+    padronizar_texto(GeneroDesejado, G2),
+    G1 == G2.
 
 musica_tem_artista(ArtistaDesejado, Musica) :-
-    get_dict(artista, Musica, ArtistaMusica),
-    padronizar_texto(ArtistaMusica, ANorm1),
-    padronizar_texto(ArtistaDesejado, ANorm2),
-    ANorm1 == ANorm2.
+    get_dict(artista, Musica, Am),
+    padronizar_texto(Am, A1),
+    padronizar_texto(ArtistaDesejado, A2),
+    A1 == A2.
 
+% ---------- Recomendação ----------
 
+% 1) Por gênero (sem repetir já-ouvidas)
+recomendar_musicas(Usuario, "1", Genero, MusicasRecomendadas) :-
+    carregar_musicas(Todas),
+    carregar_scrobbles(Scs),
+    include(scrobble_do_usuario(Usuario.email), Scs, Hist),
+    extrair_titulos_ouvidos(Hist, Titulos),
+    include(musica_tem_genero(Genero), Todas, C0),
+    exclude(ja_ouviu(Titulos), C0, C),
+    length(C, L), N is min(3, L),
+    sublist(C, N, MusicasRecomendadas).
+
+% 2) Por artista (sem repetir já-ouvidas)
+recomendar_musicas(Usuario, "2", Artista, MusicasRecomendadas) :-
+    carregar_musicas(Todas),
+    carregar_scrobbles(Scs),
+    include(scrobble_do_usuario(Usuario.email), Scs, Hist),
+    extrair_titulos_ouvidos(Hist, Titulos),
+    include(musica_tem_artista(Artista), Todas, C0),
+    exclude(ja_ouviu(Titulos), C0, C),
+    length(C, L), N is min(3, L),
+    sublist(C, N, MusicasRecomendadas).
+
+% 3) Baseada no histórico (respeita a ORDEM dos gêneros top e não repete)
+recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
+    carregar_musicas(Todas),
+    carregar_scrobbles(Scs),
+    include(scrobble_do_usuario(Usuario.email), Scs, Hist),
+
+    generos_mais_ouvidos(Hist, GenerosOrdenados),     % p.ex. ["mpb","rock","forro","pop"]
+    extrair_titulos_ouvidos(Hist, TitulosOuvidos),    % títulos já ouvidos (normalizados)
+
+    top_k_por_generos(GenerosOrdenados, TitulosOuvidos, Todas, 3, CandsOrdenadas),
+
+    ( CandsOrdenadas \= [] ->
+        MusicasRecomendadas = CandsOrdenadas
+    ;   % fallback: tenta do gênero #1 mesmo assim; se não houver, pega as 3 primeiras do catálogo
+        ( GenerosOrdenados = [GTop|_] ->
+            include(musica_tem_genero(GTop), Todas, CTop0),
+            exclude(ja_ouviu(TitulosOuvidos), CTop0, CTop),
+            take(3, CTop, MusicasRecomendadas)
+        ;   take(3, Todas, MusicasRecomendadas)
+        )
+    ).
+% Pega até K músicas seguindo a ORDEM dos gêneros preferidos
+top_k_por_generos([], _Titulos, _Musicas, _K, []) :- !.
+top_k_por_generos(_Gs, _Titulos, _Musicas, 0, []) :- !.
+top_k_por_generos([G|Gs], Titulos, Musicas, K, Recs) :-
+    % Candidatas deste gênero (a função musica_tem_genero/2 já normaliza internamente)
+    include(musica_tem_genero(G), Musicas, C0),
+    exclude(ja_ouviu(Titulos), C0, CandidatasG),
+
+    take(K, CandidatasG, UsadasG),
+    length(UsadasG, NUsadas),
+    KRest is K - NUsadas,
+
+    ( KRest =:= 0 ->
+        Recs = UsadasG
+    ;   top_k_por_generos(Gs, Titulos, Musicas, KRest, RecsRest),
+        append(UsadasG, RecsRest, Recs)
+    ).
+
+eh_musica_mais_ouvida_genero(TitulosOuvidos, GenerosPreferidos, Musica) :-
+    get_dict(titulo, Musica, T0),
+    valor_para_string(T0, TS), string_lower(TS, TL),
+    \+ member(TL, TitulosOuvidos),
+    get_dict(genero, Musica, G0),
+    valor_para_string(G0, GS), string_lower(GS, GL),
+    member(GL, GenerosPreferidos).
+
+% ---------- Utilidades ----------
+
+sublist(List, N, Sub) :- length(Sub, N), append(Sub, _, List).
+
+take(0, _, []) :- !.
+take(_, [], []) :- !.
+take(N, [H|T], [H|R]) :- N > 0, N1 is N - 1, take(N1, T, R).
+
+get_artista(S, A) :- A = S.musica.artista.
+get_musica(S, T, A) :- T = S.musica.titulo, A = S.musica.artista.
+get_duracao(S, D) :- D = S.musica.duracao.
+
+tem_scrobble(Scs, usuario(_, Email, _, _)) :-
+    atom_string(EAtom, Email),
+    member(S, Scs),
+    get_dict(emailUsuario, S, EAtom).
+
+max_por_frequencia(Lista, ElemMax, CMax) :-
+    freq_lista(Lista, Freqs),
+    keysort(Freqs, Ord),
+    reverse(Ord, [CMax-ElemMax|_]).
+
+freq_lista(Lista, Freqs) :-
+    sort(Lista, Unicos),
+    findall(C-E,
+        ( member(E, Unicos), include(=(E), Lista, Sub), length(Sub, C) ),
+        Freqs).
+
+format_tempo(SegundosFloat, Out) :-
+    Segundos is round(SegundosFloat),
+    H is Segundos // 3600,
+    M is (Segundos mod 3600) // 60,
+    S is Segundos mod 60,
+    format(atom(Out), '~|~`0t~d~2+:~|~`0t~d~2+:~|~`0t~d~2+', [H, M, S]).
+
+conta_e_ordena(Lista, ContagemOrdenada) :-
+    msort(Lista, LO),
+    clumped(LO, Pares),
+    maplist(item_contagem, Pares, Contagem),
+    predsort(compare_contagem, Contagem, ContagemOrdenada).
+
+compare_contagem(>, (_,C1), (_,C2)) :- C1 > C2.
+compare_contagem(<, (_,C1), (_,C2)) :- C1 < C2.
+compare_contagem(=, _, _).
+
+item_contagem(Lista, (Item, C)) :- Lista = [Item|_], length(Lista, C).
+
+usuario_para_dict(usuario(N,E,S,Conqs), usuario{nome:N, email:E, senha:S, conquistas:Conqs}).
+
+% --------------------- UI: escolha de gênero ---------------------
 
 escolher_genero(GeneroEscolhido) :-
-    carregar_musicas(Musicas),
-    findall(Genero, (member(M, Musicas), get_dict(genero, M, Genero)), Generos),
-    sort(Generos, GenerosUnicos),
-
+    carregar_musicas(Ms),
+    findall(G, (member(M, Ms), get_dict(genero, M, G)), Gs),
+    sort(Gs, Unicos),
     writeln('Gêneros disponíveis:'),
-    listar_generos_numerados(GenerosUnicos, 1),
-
+    listar_generos_numerados(Unicos, 1),
     write('Escolha o número do gênero: '), flush_output,
     read_line_to_string(user_input, Entrada),
-    ( catch(number_string(Num, Entrada), _, fail),
-      nth1(Num, GenerosUnicos, GeneroEscolhido) ->
+    ( catch(number_string(N, Entrada), _, fail),
+      nth1(N, Unicos, GeneroEscolhido) ->
         true
-    ; writeln('Opção inválida. tente novamente.'),
-      escolher_genero(GeneroEscolhido)
+    ; writeln('Opção inválida. tente novamente.'), escolher_genero(GeneroEscolhido)
     ).
 
 listar_generos_numerados([], _).
@@ -684,67 +542,3 @@ listar_generos_numerados([G|Gs], N) :-
     format('~d - ~w~n', [N, G]),
     N1 is N + 1,
     listar_generos_numerados(Gs, N1).
-
-
-get_artista(Scrobble, Artista) :- Artista = Scrobble.musica.artista.
-get_musica(Scrobble, Titulo, Artista) :-
-    Titulo = Scrobble.musica.titulo,
-    Artista = Scrobble.musica.artista.
-get_duracao(Scrobble, Duracao) :- Duracao = Scrobble.musica.duracao.
-
-tem_scrobble(Scrobbles, usuario(_, Email, _, _)) :-
-    atom_string(EmailAtom, Email),
-    member(S, Scrobbles),
-    get_dict(emailUsuario, S, EmailAtom).
-
-
-max_por_frequencia(Lista, ElementoMax, CountMax) :-
-    freq_lista(Lista, Frequencias),
-    keysort(Frequencias, Ordenadas),
-    reverse(Ordenadas, [CountMax-ElementoMax | _]).
-
-freq_lista(Lista, Frequencias) :-
-    sort(Lista, Unicos),
-    findall(Count-Elem,
-        ( member(Elem, Unicos),
-          include(=(Elem), Lista, Sub),
-          length(Sub, Count)
-        ),
-        Frequencias).
-
-format_tempo(SegundosFloat, Formatado) :-
-    Segundos is round(SegundosFloat),  % <- conversão segura para inteiro
-    Horas is Segundos // 3600,
-    Minutos is (Segundos mod 3600) // 60,
-    SegRestantes is Segundos mod 60,
-    format(atom(Formatado), '~|~`0t~d~2+:~|~`0t~d~2+:~|~`0t~d~2+', [Horas, Minutos, SegRestantes]).
-
-
-
-conta_e_ordena(Lista, ContagemOrdenada) :-
-    msort(Lista, ListaOrdenada),
-    clumped(ListaOrdenada, Pares),
-    maplist(item_contagem, Pares, Contagem),
-    predsort(compare_contagem, Contagem, ContagemOrdenada).
-
-compare_contagem(>, (_, C1), (_, C2)) :- C1 > C2.
-compare_contagem(<, (_, C1), (_, C2)) :- C1 < C2.
-compare_contagem(=, _, _).
-
-compare_scrobbles(>, S1, S2) :- S1.scrobbles > S2.scrobbles.
-compare_scrobbles(<, S1, S2) :- S1.scrobbles < S2.scrobbles.
-compare_scrobbles(=, _, _).
-
-item_contagem(Lista, (Item, Contagem)) :-
-    Lista = [Item|_],
-    length(Lista, Contagem).
-
-take(0, _, []) :- !.
-take(_, [], []) :- !.
-take(N, [H|T], [H|R]) :-
-    N > 0,
-    N1 is N - 1,
-    take(N1, T, R).
-
-
-usuario_para_dict(usuario(Nome, Email, Senha, Conqs), usuario{nome:Nome, email:Email, senha:Senha, conquistas:Conqs}).

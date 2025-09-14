@@ -23,6 +23,8 @@
 :- use_module(library(http/json)).
 :- use_module(library(date)).
 :- use_module(library(apply)).
+:- use_module(library(random)).
+
 
 
 :- ensure_loaded('../catalogo.pl').
@@ -390,7 +392,9 @@ generos_mais_ouvidos(Historico, GenerosOrdenados) :-
     pairs_values(Ordenadas, GenerosOrdenados).
 
 count_occurrences(Elem, Lista, C) :- include(==(Elem), Lista, L), length(L, C).
-
+sublist_aleatoria(List, N, Sub) :-
+    random_permutation(List, Perm),
+    take(N, Perm, Sub).
 % ---------- Filtros de catálogo (gênero/artista com normalização) ----------
 
 musica_tem_genero(GeneroDesejado, Musica) :-
@@ -434,20 +438,33 @@ recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
     carregar_musicas(Todas),
     carregar_scrobbles(Scs),
     include(scrobble_do_usuario(Usuario.email), Scs, Hist),
+    (   % Caso 0: sem histórico → aleatórias do catálogo
+        Hist == [] ->
+        sublist_aleatoria(Todas, 3, MusicasRecomendadas)
+    ;   % Caso 1: com histórico → usa ordem de gêneros
+        generos_mais_ouvidos(Hist, GensOrd),
+        extrair_titulos_ouvidos(Hist, Titulos),
 
-    generos_mais_ouvidos(Hist, GenerosOrdenados),     
-    extrair_titulos_ouvidos(Hist, TitulosOuvidos),    
-
-    top_k_por_generos(GenerosOrdenados, TitulosOuvidos, Todas, 3, CandsOrdenadas),
-
-    ( CandsOrdenadas \= [] ->
-        MusicasRecomendadas = CandsOrdenadas
-    ;  
-        ( GenerosOrdenados = [GTop|_] ->
-            include(musica_tem_genero(GTop), Todas, CTop0),
-            exclude(ja_ouviu(TitulosOuvidos), CTop0, CTop),
-            take(3, CTop, MusicasRecomendadas)
-        ;   take(3, Todas, MusicasRecomendadas)
+        top_k_por_generos(GensOrd, Titulos, Todas, 3, C0),
+        (   C0 \= [] ->
+            MusicasRecomendadas = C0
+        ;   % Caso 2: ainda vazio → tenta completar só com o gênero #1
+            (   GensOrd = [GTop|_] ->
+                include(musica_tem_genero(GTop), Todas, CTop0),
+                exclude(ja_ouviu(Titulos), CTop0, CTop),
+                (   CTop \= [] ->
+                    take(3, CTop, MusicasRecomendadas)
+                ;   % Caso 3: não sobrou nada do top gênero → sorteia das NÃO ouvidas
+                    exclude(ja_ouviu(Titulos), Todas, NaoOuvidas),
+                    (   NaoOuvidas \= [] ->
+                        sublist_aleatoria(NaoOuvidas, 3, MusicasRecomendadas)
+                    ;   % Último fallback: sorteia do catálogo inteiro
+                        sublist_aleatoria(Todas, 3, MusicasRecomendadas)
+                    )
+                )
+            ;   % Sem gêneros ordenados (defensivo): cai para aleatórias
+                sublist_aleatoria(Todas, 3, MusicasRecomendadas)
+            )
         )
     ).
 

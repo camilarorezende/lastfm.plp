@@ -537,11 +537,13 @@ freq_lista(Lista, Frequencias) :-
         ),
         Frequencias).
 
-format_tempo(Segundos, Formatted) :-
+format_tempo(SegundosFloat, Formatado) :-
+    Segundos is round(SegundosFloat),  % <- conversão segura para inteiro
     Horas is Segundos // 3600,
     Minutos is (Segundos mod 3600) // 60,
-    Seg is Segundos mod 60,
-    format(atom(Formatted), '~|~`0t~d~2+:~|~`0t~d~2+:~|~`0t~d~2+', [Horas, Minutos, Seg]).
+    SegRestantes is Segundos mod 60,
+    format(atom(Formatado), '~|~`0t~d~2+:~|~`0t~d~2+:~|~`0t~d~2+', [Horas, Minutos, SegRestantes]).
+
 
 
 conta_e_ordena(Lista, ContagemOrdenada) :-

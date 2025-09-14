@@ -19,6 +19,6 @@ json_to_musica(JsonDict, MusicaDict) :-
 
 musica_to_json(MusicaDict, JsonDict) :-
     get_dict(genero, MusicaDict, GeneroAtom),
-    genero_string_atom(GeneroString, GeneroAtom),
+    genero_string_atom(GeneroAtom, GeneroString),  % inverter ordem aqui
     TempDict = MusicaDict.put(genero, GeneroString),
-    del_dict(tag, TempDict, _, JsonDict). 
+    del_dict(tag, TempDict, _, JsonDict).

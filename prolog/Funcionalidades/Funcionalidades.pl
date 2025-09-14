@@ -4,13 +4,14 @@
 :- consult('Conquistas.pl').
 :- discontiguous scrobble_do_usuario/2.
 :- discontiguous compare_scrobbles/3.
-
+:- use_module(library(apply)).
+:- ['../catalogo.pl'].
 
 
 % --------------------- Caminhos dos arquivos JSON ---------------------
 
 caminho_usuarios('../usuarios.json').
-caminho_musicas('../catalogo.json').
+caminho_musicas('../catalogo.pl').
 caminho_scrobbles('../scrobbles.json').
 
 % --------------------- Validações ---------------------
@@ -95,14 +96,18 @@ login(EmailInput, SenhaInput, usuario{nome:Nome, email:Email}) :-
 % --------------------- Músicas ---------------------
 
 carregar_musicas(MusicasDict) :-
-    caminho_musicas(File),
-    ( exists_file(File) ->
-        open(File, read, Stream),
-        json_read(Stream, MusicasJSON),
-        close(Stream),
-        converter_json_para_dicts(MusicasJSON, MusicasDict)
-    ; MusicasDict = []
+    findall(
+        musica{
+            titulo: Titulo,
+            artista: Artista,
+            album: Album,
+            genero: Genero,
+            duracao: Duracao
+        },
+        musica(Titulo, Artista, Album, Genero, Duracao),
+        MusicasDict
     ).
+
 
 converter_json_para_dicts([], []).
 converter_json_para_dicts([json(Obj)|T], [Dict|DT]) :-
@@ -408,10 +413,13 @@ gerar_ranking_global :-
     ).
 
 scrobble_do_usuario(Email, Scrobble) :-
-    get_dict(emailUsuario, Scrobble, EmailScrobble),
-    string_lower(Email, Lower1),
+    get_dict(emailUsuario, Scrobble, EmailScrobble0),
+    (atom(EmailScrobble0) -> atom_string(EmailScrobble0, EmailScrobble) ; EmailScrobble = EmailScrobble0),
+    (atom(Email) -> atom_string(Email, EmailStr) ; EmailStr = Email),
+    string_lower(EmailStr, Lower1),
     string_lower(EmailScrobble, Lower2),
     Lower1 == Lower2.
+
 
 compare_scrobbles(Order, A, B) :-
     A.scrobbles >= B.scrobbles -> Order = (<) ; Order = (>).
@@ -443,7 +451,7 @@ verificar_compatibilidade(U1, U2, Compatibilidade) :-
     ( length(SetA1, LSetA1), LSetA1 > 0 -> CompA is LComunsA / LSetA1 ; CompA = 0 ),
     Compatibilidade is (CompG * 0.6) + (CompA * 0.4).
 
-% pega o gênero mais ouvido do usuário
+
 genero_mais_ouvido(UsuarioEmail, GeneroMais) :-
     carregar_scrobbles(TodosScrobbles),
     include(scrobble_do_usuario(UsuarioEmail), TodosScrobbles, ScsUsuario),
@@ -451,40 +459,68 @@ genero_mais_ouvido(UsuarioEmail, GeneroMais) :-
     most_common(Generos, GeneroMais).
 
 
+filtrar_nao_ouvidas([], _, []).
+filtrar_nao_ouvidas([M|Ms], TitulosOuvidos, NaoOuvidas) :-
+    get_dict(titulo, M, Titulo),
+    member(Titulo, TitulosOuvidos),
+    !,
+    filtrar_nao_ouvidas(Ms, TitulosOuvidos, NaoOuvidas).
+filtrar_nao_ouvidas([M|Ms], TitulosOuvidos, [M|NaoOuvidas]) :-
+    filtrar_nao_ouvidas(Ms, TitulosOuvidos, NaoOuvidas).
+
+
 recomendar_musicas(Usuario, Opcao, Parametro, Recomendacoes) :-
     carregar_musicas(Musicas),
     carregar_scrobbles(TodosScrobbles),
 
     include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
+  
+    findall(Musica, (member(S, HistoricoUsuario), get_dict(musica, S, Musica)), MusicasOuvidas),
+  
+    findall(Titulo, (member(M, MusicasOuvidas), get_dict(titulo, M, Titulo)), TitulosOuvidos),
 
-    findall(M, (member(S, HistoricoUsuario), M = S.musica), MusicasOuvidas),
+    filtrar_nao_ouvidas(Musicas, TitulosOuvidos, NaoOuvidas),
 
-    subtract(Musicas, MusicasOuvidas, NaoOuvidas),
-
-    (   Opcao == '1' -> % Por gênero fornecido
+ 
+    (   Opcao == '1' -> % Por gênero
         include(musica_tem_genero(Parametro), NaoOuvidas, Filtradas)
-    ;   Opcao == '2' -> % Por artista fornecido
+    ;   Opcao == '2' -> % Por artista
         include(musica_tem_artista(Parametro), NaoOuvidas, Filtradas)
-    ;   Opcao == '3' -> % Automática baseada no gênero mais ouvido
+    ;   Opcao == '3' -> % Baseada no gênero mais ouvido
         genero_mais_ouvido(Usuario.email, GeneroMais),
         (GeneroMais \= none ->
             include(musica_tem_genero(GeneroMais), NaoOuvidas, Filtradas)
         ;
-            Filtradas = NaoOuvidas  
+            Filtradas = NaoOuvidas
         )
     ;   Filtradas = []
     ),
 
+    % Embaralha e seleciona até 3 recomendações
     random_permutation(Filtradas, Embaralhadas),
     take(3, Embaralhadas, Recomendacoes).
 
+
+
 genero_string_atom(String, Atom) :- atom_string(Atom, String).
 
-musica_tem_genero(GeneroString, Musica) :-
-    genero_string_atom(GeneroString, GeneroAtom),
-    Musica.genero == GeneroAtom.
+musica_tem_genero(GeneroDesejado, Musica) :-
+    ( get_dict(genero, Musica, GeneroMusica) ->
+        downcase_atom(GeneroMusica, GNorm1),
+        downcase_atom(GeneroDesejado, GNorm2),
+        GNorm1 = GNorm2
+    ; false
+    ).
 
-musica_tem_artista(Artista, Musica) :- Musica.artista == Artista.
+
+musica_tem_artista(ArtistaDesejado, Musica) :-
+    ( get_dict(artista, Musica, ArtistaMusica) ->
+        downcase_atom(ArtistaMusica, ANorm1),
+        downcase_atom(ArtistaDesejado, ANorm2),
+        ANorm1 = ANorm2
+    ; false
+    ).
+
 
 
 escolher_genero(GeneroEscolhido) :-

@@ -10,7 +10,6 @@ musica("Get Lucky", "Daft Punk", "Random Access Memories", "Eletronica", 369).
 musica("Firestone", "Kygo", "Cloud Nine", "Eletronica", 238).
 musica("Anunciação", "Alceu Valença", "Anunciação", "Forro", 255).
 musica("Xote das Meninas", "Luiz Gonzaga", "Luiz Gonzaga", "Forro", 210).
-musica("Asa Branca", "Luiz Gonzaga", "Asa Branca", "Forro", 185).
 musica("Eu Só Quero um Xodó", "Dominguinhos", "Eu Só Quero um Xodó", "Forro", 195).
 musica("Isso Aqui Tá Bom Demais", "Dominguinhos", "Isso Aqui Tá Bom Demais", "Forro", 240).
 musica("Morena Tropicana", "Alceu Valença", "Anjo Avesso", "Forro", 230).
@@ -28,16 +27,11 @@ musica("Tô Querendo", "MC Kekel", "Tô Querendo", "Funk", 215).
 musica("Sentadão", "Pedro Sampaio", "Sentadão", "Funk", 205).
 musica("Agora Vai Sentar", "MCs Jhowzinho e Kadinho", "Agora Vai Sentar", "Funk", 200).
 musica("Ta Tum Tum", "MC Kevinho", "Ta Tum Tum", "Funk", 195).
-musica("Lose Yourself", "Eminem", "8 Mile", "HipHop", 326).
 musica("Juicy", "The Notorious B.I.G.", "Ready to Die", "HipHop", 300).
-musica("C.R.E.A.M.", "Wu-Tang Clan", "Enter the Wu-Tang", "HipHop", 230).
 musica("N.Y. State of Mind", "Nas", "Illmatic", "HipHop", 296).
 musica("HUMBLE.", "Kendrick Lamar", "DAMN.", "HipHop", 177).
 musica("Alright", "Kendrick Lamar", "To Pimp a Butterfly", "HipHop", 230).
 musica("99 Problems", "Jay-Z", "The Black Album", "HipHop", 213).
-musica("Gold Digger", "Kanye West", "Late Registration", "HipHop", 245).
-musica("God's Plan", "Drake", "Scorpion", "HipHop", 198).
-musica("Ms. Jackson", "OutKast", "Stankonia", "HipHop", 242).
 musica("Fluorescent Adolescent", "Arctic Monkeys", "Favourite Worst Nightmare", "Indie", 182).
 musica("Take Me Out", "Franz Ferdinand", "Franz Ferdinand", "Indie", 238).
 musica("Pumped Up Kicks", "Foster the People", "Torches", "Indie", 238).
@@ -81,14 +75,9 @@ musica("Bad Guy", "Billie Eilish", "When We All Fall Asleep, Where Do We Go?", "
 musica("God's Plan", "Drake", "Scorpion", "Rap", 198).
 musica("Sicko Mode", "Travis Scott", "Astroworld", "Rap", 312).
 musica("Lose Yourself", "Eminem", "8 Mile", "Rap", 326).
-musica("Juicy", "The Notorious B.I.G.", "Ready to Die", "Rap", 300).
-musica("N.Y. State of Mind", "Nas", "Illmatic", "Rap", 296).
 musica("C.R.E.A.M.", "Wu-Tang Clan", "Enter the Wu-Tang", "Rap", 230).
-musica("99 Problems", "Jay-Z", "The Black Album", "Rap", 213).
-musica("Gold Digger", "Kanye West", "Late Registration", "Rap", 245).
 musica("Ms. Jackson", "OutKast", "Stankonia", "Rap", 242).
 musica("Smells Like Teen Spirit", "Nirvana", "Nevermind", "Rock", 301).
-musica("Bohemian Rhapsody", "Queen", "A Night at the Opera", "Rock", 354).
 musica("Hotel California", "Eagles", "Hotel California", "Rock", 391).
 musica("Sweet Child O' Mine", "Guns N' Roses", "Appetite for Destruction", "Rock", 356).
 musica("Back In Black", "AC/DC", "Back In Black", "Rock", 255).

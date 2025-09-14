@@ -1,5 +1,6 @@
 :- module(funcionalidades, [
     carregar_usuarios_json/0,
+    carregar_usuarios/1,
     carregar_musicas/1,
     carregar_scrobbles/1,
     cadastrar_usuario/3,
@@ -12,6 +13,7 @@
     recomendar_musicas/4,
     escolher_genero/1,
     listar_musicas/2,
+    listar_scrobbles_usuario/1,
     usuario_para_dict/2
 ]).
 

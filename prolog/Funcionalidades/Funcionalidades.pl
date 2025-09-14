@@ -136,17 +136,16 @@ carregar_scrobbles(Scrobbles) :-
 converter_scrobbles([], []).
 converter_scrobbles([json(Obj)|T], [NovoDict|ST]) :-
     dict_create(Dict, _, Obj),
-
-    % Corrige o campo musica, que pode vir como json([...])
-    ( get_dict(musica, Dict, MusicaJSON),
-      MusicaJSON = json(MusicaAssoc) ->
-        dict_create(MusicaDict, _, MusicaAssoc),
+    ( get_dict(musica, Dict, MusicaData) ->
+        ( MusicaData = json(MusicaAssoc) ->
+            dict_create(MusicaDict, _, MusicaAssoc)
+        ; MusicaData = MusicaDict  % já é um dict
+        ),
         put_dict(musica, Dict, MusicaDict, NovoDict)
-    ;
-        NovoDict = Dict  % Se já for dict, mantém
+    ; NovoDict = Dict
     ),
-
     converter_scrobbles(T, ST).
+
 
 
 listar_scrobbles_usuario(Scrobbles) :-
@@ -232,15 +231,22 @@ ja_tem_conquista(Email, Conquista) :-
 % --------------------- Estatísticas ---------------------
 
 tempo_total_usuario(Scrobbles, usuario(_, Email, _, _), Total) :-
-    include([S]>> (S.emailUsuario == Email), Scrobbles, ScrobblesUsuario),
+    include(
+        {Email}/[S]>>(
+            get_dict(emailUsuario, S, EmailS),
+            atom_string(EmailS, Email)
+        ),
+        Scrobbles,
+        ScrobblesUsuario
+    ),
     findall(Dur,
-            ( member(S, ScrobblesUsuario),
-              ( get_dict(musica, S, Musica),
-                get_dict(duracao, Musica, Dur)
-              -> true ; Dur = 0 )
-            ),
-            Duracoes),
+        ( member(S, ScrobblesUsuario),
+          get_dict(musica, S, Musica),
+          ( get_dict(duracao, Musica, Dur) -> true ; Dur = 0 )
+        ),
+        Duracoes),
     sum_list(Duracoes, Total).
+
 
 
 estatisticas_globais :-
@@ -512,9 +518,9 @@ get_musica(Scrobble, Titulo, Artista) :-
 get_duracao(Scrobble, Duracao) :- Duracao = Scrobble.musica.duracao.
 
 tem_scrobble(Scrobbles, usuario(_, Email, _, _)) :-
+    atom_string(EmailAtom, Email),
     member(S, Scrobbles),
-    get_dict(emailUsuario, S, EmailScrobble),
-    Email == EmailScrobble.
+    get_dict(emailUsuario, S, EmailAtom).
 
 
 max_por_frequencia(Lista, ElementoMax, CountMax) :-

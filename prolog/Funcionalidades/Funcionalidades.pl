@@ -418,9 +418,8 @@ recomendar_musicas(Usuario, "1", Genero, MusicasRecomendadas) :-
     include(scrobble_do_usuario(Usuario.email), Scs, Hist),
     extrair_titulos_ouvidos(Hist, Titulos),
     include(musica_tem_genero(Genero), Todas, C0),
-    exclude(ja_ouviu(Titulos), C0, C),
-    length(C, L), N is min(3, L),
-    sublist(C, N, MusicasRecomendadas).
+    exclude(ja_ouviu(Titulos), C0, Candidatas),
+    sublist_aleatoria(Candidatas, 3, MusicasRecomendadas).
 
 
 recomendar_musicas(Usuario, "2", Artista, MusicasRecomendadas) :-
@@ -429,9 +428,8 @@ recomendar_musicas(Usuario, "2", Artista, MusicasRecomendadas) :-
     include(scrobble_do_usuario(Usuario.email), Scs, Hist),
     extrair_titulos_ouvidos(Hist, Titulos),
     include(musica_tem_artista(Artista), Todas, C0),
-    exclude(ja_ouviu(Titulos), C0, C),
-    length(C, L), N is min(3, L),
-    sublist(C, N, MusicasRecomendadas).
+    exclude(ja_ouviu(Titulos), C0, Candidatas),
+    sublist_aleatoria(Candidatas, 3, MusicasRecomendadas).
 
 
 recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-

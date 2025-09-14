@@ -122,11 +122,11 @@ cadastrar_usuario(Nome, Email, Senha) :-
     \+ usuario(_, Email, _, _),
     assertz(usuario(Nome, Email, Senha, [])),
     salvar_usuarios_json,
-    writeln('Usuário cadastrado com sucesso!').
+    writeln('\nUsuário cadastrado com sucesso!').
 cadastrar_usuario(Nome, Email, _) :-
-    ( \+ valid_usuario(Nome) -> writeln('Nome inválido: deve conter apenas letras e espaços')
-    ; \+ valid_email(Email)   -> writeln('Email inválido. Tente novamente.')
-    ; usuario(_, Email, _, _) -> writeln('Já existe um usuário com esse email!')
+    ( \+ valid_usuario(Nome) -> writeln('\nNome inválido: deve conter apenas letras e espaços')
+    ; \+ valid_email(Email)   -> writeln('\nEmail inválido. Tente novamente.')
+    ; usuario(_, Email, _, _) -> writeln('\nJá existe um usuário com esse email!')
     ).
 
 login(EmailInput, SenhaInput, usuario{nome:Nome, email:Email}) :-
@@ -213,21 +213,21 @@ scrobble_para_json(Sc, json([emailUsuario=Sc.emailUsuario, momento=Sc.momento, m
 
 ver_conquistas(Email) :-
     usuario(_, Email, _, Conqs),
-    ( Conqs == [] -> writeln('Você ainda não possui conquistas.')
+    ( Conqs == [] -> writeln('\nVocê ainda não possui conquistas.')
     ; forall(member(C, Conqs), format('- ~w~n', [C]))
     ), !.
-ver_conquistas(_) :- writeln('Usuário não encontrado.').
+ver_conquistas(_) :- writeln('\nUsuário não encontrado.').
 
 adicionar_conquista(Email, Conquista) :-
     usuario(Nome, Email, Senha, Conqs),
     ( member(Conquista, Conqs) ->
-        writeln('Usuário já possui essa conquista.')
+        writeln('\nUsuário já possui essa conquista.')
     ; retract(usuario(Nome, Email, Senha, Conqs)),
       assertz(usuario(Nome, Email, Senha, [Conquista|Conqs])),
       salvar_usuarios_json,
-      writeln('Nova conquista desbloqueada!')
+      writeln('\nNova conquista desbloqueada!')
     ), !.
-adicionar_conquista(_, _) :- writeln('Usuário não encontrado.').
+adicionar_conquista(_, _) :- writeln('\nUsuário não encontrado.').
 
 verificar_e_aplicar_conquistas(EmailUsuario) :-
     carregar_scrobbles(Scs),
@@ -281,7 +281,7 @@ gerar_ranking_pessoal(EmailU) :-
         ),
         MsDict),
     ( MsDict == [] ->
-        writeln('Você ainda não tem nenhum scrobble :( Que tal dar play em alguma música? ;)')
+        writeln('\nVocê ainda não tem nenhum scrobble :( Que tal dar play em alguma música? ;)')
     ; maplist(dict_para_musica_termo, MsDict, Ms),
       contar_frequencias(Ms, CMs), ordenar_por_valor_decrescente(CMs, RankM),
       findall(G, (member(musica(_, _, G), Ms)), Gens),
@@ -358,7 +358,11 @@ imprime_rank_global(R) :- imprime_rank_global(R, 1).
 verificar_compatibilidade(U1, U2) :-
     verificar_compatibilidade(U1, U2, C),
     P is C * 100,
-    format('Compatibilidade entre ~w e ~w: ~2f%%~n', [U1.email, U2.email, P]).
+    format('\nCompatibilidade entre ~w e ~w: ~2f%%~n', [U1.nome, U2.nome, P]),
+    ( P < 50  -> writeln('\nXiii... vocês têm gostos bem diferentes! Talvez devam encontrar algo em comum. :v')
+    ; P >= 80  -> writeln('\nWow!!! Que match hein?! Perfeito para montarem uma playlist :D')
+    ; writeln('\nNada mau!! Que tal fortalecerem esse laço?! ;)')
+    ).
 
 verificar_compatibilidade(U1, U2, Compatibilidade) :-
     carregar_scrobbles(Scs),
@@ -531,14 +535,14 @@ escolher_genero(GeneroEscolhido) :-
     carregar_musicas(Ms),
     findall(G, (member(M, Ms), get_dict(genero, M, G)), Gs),
     sort(Gs, Unicos),
-    writeln('Gêneros disponíveis:'),
+    writeln('\nGêneros disponíveis:'),
     listar_generos_numerados(Unicos, 1),
-    write('Escolha o número do gênero: '), flush_output,
+    write('\nEscolha o número do gênero: '), flush_output,
     read_line_to_string(user_input, Entrada),
     ( catch(number_string(N, Entrada), _, fail),
       nth1(N, Unicos, GeneroEscolhido) ->
         true
-    ; writeln('Opção inválida. tente novamente.'), escolher_genero(GeneroEscolhido)
+    ; writeln('\nOpção inválida. tente novamente.'), escolher_genero(GeneroEscolhido)
     ).
 
 listar_generos_numerados([], _).

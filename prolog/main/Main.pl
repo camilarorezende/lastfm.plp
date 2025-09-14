@@ -1,6 +1,7 @@
-:- use_module('../Funcionalidades/Funcionalidades').
+﻿:- use_module('../Funcionalidades/Funcionalidades').
 :- use_module(library(strings)).
 :- initialization(run).
+:- encoding(utf8).
 
 
 inicializar :-
@@ -31,15 +32,15 @@ menu :-
 
 menu_opcao("1") :-
     writeln('Digite seu Nome:'),  read_line_to_string(user_input, Nome),
-    writeln('Digite seu Email:'), read_line_to_string(user_input, Email),
-    writeln('Digite sua Senha:'), read_line_to_string(user_input, Senha),
+    writeln('\nDigite seu Email:'), read_line_to_string(user_input, Email),
+    writeln('\nDigite sua Senha:'), read_line_to_string(user_input, Senha),
     cadastrar_usuario(Nome, Email, Senha),
     menu.
 menu_opcao("2") :-
-    writeln('Digite seu Email:'), read_line_to_string(user_input, Email),
-    writeln('Digite sua Senha:'), read_line_to_string(user_input, Senha),
+    writeln('\nDigite seu Email:'), read_line_to_string(user_input, Email),
+    writeln('\nDigite sua Senha:'), read_line_to_string(user_input, Senha),
     (   login(Email, Senha, Usuario)
-    ->  format('Bem-vindo(a) de volta, ~w!~n', [Usuario.nome]),
+    ->  format('\nBem-vindo(a) de volta, ~w!~n', [Usuario.nome]),
         menu_usuario_logado(Usuario)
     ;   writeln('Email ou senha incorretos. Tente novamente.'),
         menu
@@ -82,8 +83,8 @@ menu_usuario_opcao("1", Usuario) :-
         E1 == E2
     ), Scs, ScsU),
     ( ScsU == [] ->
-        writeln('Você ainda não tem scrobbles registrados.')
-    ;   writeln('Histórico de scrobbles do usuário:'),
+        writeln('\nVocê ainda não tem scrobbles registrados.')
+    ;   writeln('\nHistórico de scrobbles do usuário:'),
         listar_scrobbles_usuario(ScsU)
     ),
     nl, menu_usuario_logado(Usuario).
@@ -96,7 +97,7 @@ menu_usuario_opcao("2", Usuario) :-
 menu_usuario_opcao("3", Usuario) :-
     carregar_musicas(Ms),
     ( Ms == [] ->
-        writeln('Nenhuma música disponível no catálogo.'),
+        writeln('\nNenhuma música disponível no catálogo.'),
         menu_usuario_logado(Usuario)
     ;   writeln('\nEscolha uma música para scrobble:'),
         listar_musicas(Ms, 1),
@@ -105,9 +106,9 @@ menu_usuario_opcao("3", Usuario) :-
         ( catch(number_string(N, Entrada), _, fail),
           nth1_safe(N, Ms, MEscolhida) ->
             registrar_scrobble(Usuario.email, MEscolhida),
-            writeln('Scrobble registrado com sucesso!'),
+            writeln('\nScrobble registrado com sucesso!'),
             menu_usuario_logado(Usuario)
-        ;   writeln('Entrada inválida. Tente novamente.'),
+        ;   writeln('\nEntrada inválida. Tente novamente.'),
             menu_usuario_logado(Usuario)
         )
     ).
@@ -118,10 +119,10 @@ menu_usuario_opcao("4", Usuario) :-
 
 menu_usuario_opcao("5", Usuario) :-
     writeln('\nEscolha o tipo de recomendação:'),
-    writeln('1 - Por gênero'),
+    writeln('\n1 - Por gênero'),
     writeln('2 - Por artista'),
     writeln('3 - Baseada no histórico'),
-    write('Escolha uma opção: '), flush_output,
+    write('\nEscolha uma opção: '), flush_output,
     read_line_to_string(user_input, RawTipoStr),
     split_string(RawTipoStr, "\n\r\t ", "\n\r\t ", Parts),
     atomics_to_string(Parts, "", TipoStr),
@@ -145,28 +146,28 @@ menu_usuario_opcao("5", Usuario) :-
                 format('- ~s - ~s (~s)~n', [TT, TA, TG])
             ))
         )
-    ;   writeln('Opção inválida! Tente novamente.')
+    ;   writeln('\nOpção inválida! Tente novamente.')
     ),
     menu_usuario_logado(Usuario).
 
 
 menu_usuario_opcao("6", Usuario) :-
-    writeln('Digite o email do outro usuário para comparar:'),
+    writeln('\nDigite o email do outro usuário para comparar:'),
     read_line_to_string(user_input, Email2),
     carregar_usuarios(Usuarios),
     ( member(UTerm, Usuarios), UTerm = usuario(_, Email2, _, _) ->
         usuario_para_dict(UTerm, U2),
         verificar_compatibilidade(Usuario, U2)
-    ; writeln('Usuário não encontrado. Tente novamente.')
+    ; writeln('\nUsuário não encontrado. Tente novamente.')
     ),
     menu_usuario_logado(Usuario).
 
 menu_usuario_opcao("7", _) :-
-    writeln('Fazendo logout...'),
+    writeln('\nFazendo logout...'),
     menu.
 
 menu_usuario_opcao(_, Usuario) :-
-    writeln('Opção inválida. Tente novamente.'),
+    writeln('\nOpção inválida. Tente novamente.'),
     menu_usuario_logado(Usuario).
 
 normalizar_string(In, Out) :-

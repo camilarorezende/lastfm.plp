@@ -26,7 +26,7 @@ conquista(Scrobbles, UsuarioEmail, "100 minutos escutados!") :-
 
 % Super Fã de [Artista] — precisa de pelo menos 10 scrobbles do mesmo artista
 conquista(Scrobbles, UsuarioEmail, Conquista) :-
-    include(scrobble_do_usuario(UsuarioEmail), Scrobbles, Scs),
+    include(scrobble_do_usuario_conquistas(UsuarioEmail), Scrobbles, Scs),
     findall(Artista,
         (member(S, Scs),
          get_dict(musica, S, M),
@@ -39,7 +39,7 @@ conquista(Scrobbles, UsuarioEmail, Conquista) :-
 
 % Viciado em [Gênero] — precisa de pelo menos 10 scrobbles do mesmo gênero
 conquista(Scrobbles, UsuarioEmail, Conquista) :-
-    include(scrobble_do_usuario(UsuarioEmail), Scrobbles, Scs),
+    include(scrobble_do_usuario_conquistas(UsuarioEmail), Scrobbles, Scs),
     findall(Genero,
         (member(S, Scs),
          get_dict(musica, S, M),
@@ -68,7 +68,7 @@ contar_ocorrencias(Lista, [X|Xs], [(X, N)|Contagens]) :-
     contar_ocorrencias(Lista, Xs, Contagens).
 
 % Verifica se scrobble pertence ao usuário
-scrobble_do_usuario(Email, Scrobble) :-
+scrobble_do_usuario_conquistas(Email, Scrobble) :-
     get_dict(emailUsuario, Scrobble, EmailScrobble),
     string_lower(Email, E1),
     string_lower(EmailScrobble, E2),

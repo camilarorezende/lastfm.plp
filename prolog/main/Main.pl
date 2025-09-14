@@ -1,7 +1,8 @@
-﻿:- use_module('../Funcionalidades/Funcionalidades').
+﻿:- set_prolog_flag(encoding, utf8).
+
+:- use_module('../Funcionalidades/Funcionalidades').
 :- use_module(library(strings)).
 :- initialization(run).
-:- encoding(utf8).
 
 
 inicializar :-
@@ -31,7 +32,7 @@ menu :-
     menu_opcao(Opcao).
 
 menu_opcao("1") :-
-    writeln('Digite seu Nome:'),  read_line_to_string(user_input, Nome),
+    writeln('\nDigite seu Nome:'),  read_line_to_string(user_input, Nome),
     writeln('\nDigite seu Email:'), read_line_to_string(user_input, Email),
     writeln('\nDigite sua Senha:'), read_line_to_string(user_input, Senha),
     cadastrar_usuario(Nome, Email, Senha),
@@ -42,12 +43,13 @@ menu_opcao("2") :-
     (   login(Email, Senha, Usuario)
     ->  format('\nBem-vindo(a) de volta, ~w!~n', [Usuario.nome]),
         menu_usuario_logado(Usuario)
-    ;   writeln('Email ou senha incorretos. Tente novamente.'),
+    ;   writeln('\nEmail ou senha incorretos. Tente novamente.'),
         menu
     ).
 menu_opcao("3") :- estatisticas_globais, menu.
 menu_opcao("4") :- gerar_ranking_global, menu.
 menu_opcao("5") :- writeln('Encerrando...').
+.
 menu_opcao(_)  :- writeln('Opção inválida.'), menu.
 
 % --------------------- MENU USUÁRIO LOGADO ----------------------------

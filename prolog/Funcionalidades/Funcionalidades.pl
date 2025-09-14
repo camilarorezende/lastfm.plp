@@ -268,7 +268,7 @@ estatisticas_globais :-
       format_tempo(TM, F),
 
       format('\nEstatísticas Globais da Plataforma:\n'),
-      format('  Artista mais ouvido: ~w (~d scrobble(s))\n', [ArtTop, CArt]),
+      format('  \nArtista mais ouvido: ~w (~d scrobble(s))\n', [ArtTop, CArt]),
       format('  Música mais ouvida: ~w - ~w (~d scrobble(s))\n', [TT, AT, CMus]),
       format('  Tempo médio de escuta por usuário: ~w\n', [F])
     ).
@@ -353,7 +353,7 @@ compare_scrobbles(=, _, _).
 imprime_rank_global([], _).
 imprime_rank_global([S|T], Pos) :-
     format('~d. ~w (~w) - ~d scrobble(s)~n', [Pos, S.nome, S.email, S.scrobbles]),
-    Pos1 is Pos - 1,
+    Pos1 is Pos + 1,
     imprime_rank_global(T, Pos1).
 imprime_rank_global(R) :- imprime_rank_global(R, 1).
 
@@ -396,9 +396,14 @@ generos_mais_ouvidos(Historico, GenerosOrdenados) :-
     pairs_values(Ordenadas, GenerosOrdenados).
 
 count_occurrences(Elem, Lista, C) :- include(==(Elem), Lista, L), length(L, C).
+
 sublist_aleatoria(List, N, Sub) :-
+    randomize,
     random_permutation(List, Perm),
     take(N, Perm, Sub).
+
+randomize :-
+    set_random(seed(random)).
 % ---------- Filtros de catálogo (gênero/artista com normalização) ----------
 
 musica_tem_genero(GeneroDesejado, Musica) :-

@@ -2,6 +2,7 @@
 :- use_module(library(strings)).
 :- initialization(run).
 
+
 inicializar :-
     carregar_usuarios_json,
     carregar_musicas(_),
@@ -148,10 +149,6 @@ menu_usuario_opcao("5", Usuario) :-
     ),
     menu_usuario_logado(Usuario).
 
-normalizar_string(In, Out) :-
-    split_string(In, " ", " \t\n\r", Parts),
-    exclude(==( ""), Parts, CleanParts),
-    atomics_to_string(CleanParts, " ", Out).
 
 menu_usuario_opcao("6", Usuario) :-
     writeln('Digite o email do outro usuário para comparar:'),
@@ -171,6 +168,11 @@ menu_usuario_opcao("7", _) :-
 menu_usuario_opcao(_, Usuario) :-
     writeln('Opção inválida. Tente novamente.'),
     menu_usuario_logado(Usuario).
+
+normalizar_string(In, Out) :-
+    split_string(In, " ", " \t\n\r", Parts),
+    exclude(==( ""), Parts, CleanParts),
+    atomics_to_string(CleanParts, " ", Out).
 
 nth1_safe(N, List, Elem) :-
     integer(N), N > 0, length(List, Len), N =< Len, nth1(N, List, Elem).

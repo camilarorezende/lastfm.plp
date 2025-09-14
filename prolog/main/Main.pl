@@ -2,6 +2,7 @@
 :- use_module(library(strings)).
 :- initialization(run).
 
+
 inicializar :-
     carregar_usuarios_json,
     carregar_musicas(_),
@@ -130,8 +131,7 @@ menu_usuario_opcao("5", Usuario) :-
         ; TipoStr == "2" ->
             write('\nDigite o nome do artista: '), flush_output,
             read_line_to_string(user_input, RawParam),
-            split_string(RawParam, "\n\r\t ", "\n\r\t ", P2),
-            atomics_to_string(P2, "", Parametro)
+            normalizar_string(RawParam, Parametro)
         ; Parametro = ""
         ),
         recomendar_musicas(Usuario, TipoStr, Parametro, Musicas),
@@ -148,6 +148,7 @@ menu_usuario_opcao("5", Usuario) :-
     ;   writeln('Opção inválida! Tente novamente.')
     ),
     menu_usuario_logado(Usuario).
+
 
 menu_usuario_opcao("6", Usuario) :-
     writeln('Digite o email do outro usuário para comparar:'),
@@ -167,6 +168,11 @@ menu_usuario_opcao("7", _) :-
 menu_usuario_opcao(_, Usuario) :-
     writeln('Opção inválida. Tente novamente.'),
     menu_usuario_logado(Usuario).
+
+normalizar_string(In, Out) :-
+    split_string(In, " ", " \t\n\r", Parts),
+    exclude(==( ""), Parts, CleanParts),
+    atomics_to_string(CleanParts, " ", Out).
 
 nth1_safe(N, List, Elem) :-
     integer(N), N > 0, length(List, Len), N =< Len, nth1(N, List, Elem).

@@ -1,5 +1,6 @@
 :- module(funcionalidades, [
     carregar_usuarios_json/0,
+    carregar_usuarios/1,
     carregar_musicas/1,
     carregar_scrobbles/1,
     cadastrar_usuario/3,
@@ -12,7 +13,10 @@
     recomendar_musicas/4,
     escolher_genero/1,
     listar_musicas/2,
-    usuario_para_dict/2
+    listar_scrobbles_usuario/1,
+    usuario_para_dict/2,
+    verificar_compatibilidade/2,
+    verificar_compatibilidade/3
 ]).
 
 :- dynamic usuario/4.
@@ -20,7 +24,7 @@
 :- use_module(library(date)).
 :- use_module(library(apply)).
 
-% Fatos do catálogo (sem módulo): garante carregamento
+
 :- ensure_loaded('../catalogo.pl').
 :- ensure_loaded('Conquistas.pl').
 
@@ -340,8 +344,8 @@ scrobble_do_usuario(Email, Sc) :-
     ( atom(Email) -> atom_string(Email, ES) ; ES = Email ),
     string_lower(ES, L1), string_lower(E, L2), L1 == L2.
 
-compare_scrobbles(>, A, B) :- A.scrobbles >  B.scrobbles.
-compare_scrobbles(<, A, B) :- A.scrobbles <  B.scrobbles.
+compare_scrobbles(<, A, B) :- A.scrobbles > B.scrobbles.
+compare_scrobbles(>, A, B) :- A.scrobbles < B.scrobbles.
 compare_scrobbles(=, _, _).
 
 imprime_rank_global([], _).
@@ -403,7 +407,7 @@ musica_tem_artista(ArtistaDesejado, Musica) :-
 
 % ---------- Recomendação ----------
 
-% 1) Por gênero (sem repetir já-ouvidas)
+
 recomendar_musicas(Usuario, "1", Genero, MusicasRecomendadas) :-
     carregar_musicas(Todas),
     carregar_scrobbles(Scs),
@@ -414,7 +418,7 @@ recomendar_musicas(Usuario, "1", Genero, MusicasRecomendadas) :-
     length(C, L), N is min(3, L),
     sublist(C, N, MusicasRecomendadas).
 
-% 2) Por artista (sem repetir já-ouvidas)
+
 recomendar_musicas(Usuario, "2", Artista, MusicasRecomendadas) :-
     carregar_musicas(Todas),
     carregar_scrobbles(Scs),
@@ -425,20 +429,20 @@ recomendar_musicas(Usuario, "2", Artista, MusicasRecomendadas) :-
     length(C, L), N is min(3, L),
     sublist(C, N, MusicasRecomendadas).
 
-% 3) Baseada no histórico (respeita a ORDEM dos gêneros top e não repete)
+
 recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
     carregar_musicas(Todas),
     carregar_scrobbles(Scs),
     include(scrobble_do_usuario(Usuario.email), Scs, Hist),
 
-    generos_mais_ouvidos(Hist, GenerosOrdenados),     % p.ex. ["mpb","rock","forro","pop"]
-    extrair_titulos_ouvidos(Hist, TitulosOuvidos),    % títulos já ouvidos (normalizados)
+    generos_mais_ouvidos(Hist, GenerosOrdenados),     
+    extrair_titulos_ouvidos(Hist, TitulosOuvidos),    
 
     top_k_por_generos(GenerosOrdenados, TitulosOuvidos, Todas, 3, CandsOrdenadas),
 
     ( CandsOrdenadas \= [] ->
         MusicasRecomendadas = CandsOrdenadas
-    ;   % fallback: tenta do gênero #1 mesmo assim; se não houver, pega as 3 primeiras do catálogo
+    ;  
         ( GenerosOrdenados = [GTop|_] ->
             include(musica_tem_genero(GTop), Todas, CTop0),
             exclude(ja_ouviu(TitulosOuvidos), CTop0, CTop),
@@ -446,7 +450,7 @@ recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
         ;   take(3, Todas, MusicasRecomendadas)
         )
     ).
-% Pega até K músicas seguindo a ORDEM dos gêneros preferidos
+
 top_k_por_generos([], _Titulos, _Musicas, _K, []) :- !.
 top_k_por_generos(_Gs, _Titulos, _Musicas, 0, []) :- !.
 top_k_por_generos([G|Gs], Titulos, Musicas, K, Recs) :-

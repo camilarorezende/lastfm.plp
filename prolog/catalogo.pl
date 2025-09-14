@@ -8,7 +8,6 @@ musica("Don't You Worry Child", "Swedish House Mafia", "Until Now", "Eletronica"
 musica("Scary Monsters and Nice Sprites", "Skrillex", "Scary Monsters and Nice Sprites", "Eletronica", 224).
 musica("Get Lucky", "Daft Punk", "Random Access Memories", "Eletronica", 369).
 musica("Firestone", "Kygo", "Cloud Nine", "Eletronica", 238).
-musica("Anunciação", "Alceu Valença", "Anunciação", "Forro", 255).
 musica("Xote das Meninas", "Luiz Gonzaga", "Luiz Gonzaga", "Forro", 210).
 musica("Eu Só Quero um Xodó", "Dominguinhos", "Eu Só Quero um Xodó", "Forro", 195).
 musica("Isso Aqui Tá Bom Demais", "Dominguinhos", "Isso Aqui Tá Bom Demais", "Forro", 240).
@@ -28,7 +27,6 @@ musica("Sentadão", "Pedro Sampaio", "Sentadão", "Funk", 205).
 musica("Agora Vai Sentar", "MCs Jhowzinho e Kadinho", "Agora Vai Sentar", "Funk", 200).
 musica("Ta Tum Tum", "MC Kevinho", "Ta Tum Tum", "Funk", 195).
 musica("Juicy", "The Notorious B.I.G.", "Ready to Die", "HipHop", 300).
-musica("N.Y. State of Mind", "Nas", "Illmatic", "HipHop", 296).
 musica("HUMBLE.", "Kendrick Lamar", "DAMN.", "HipHop", 177).
 musica("Alright", "Kendrick Lamar", "To Pimp a Butterfly", "HipHop", 230).
 musica("99 Problems", "Jay-Z", "The Black Album", "HipHop", 213).
@@ -45,7 +43,6 @@ musica("Helena Beat", "Foster the People", "Torches", "Indie", 240).
 musica("Aquarela do Brasil", "Ary Barroso", "Aquarela do Brasil", "MPB", 180).
 musica("Garota de Ipanema", "Tom Jobim e Vinicius de Moraes", "Getz/Gilberto", "MPB", 210).
 musica("Chega de Saudade", "João Gilberto", "Chega de Saudade", "MPB", 170).
-musica("O Bêbado e a Equilibrista", "João Bosco", "O Bêbado e a Equilibrista", "MPB", 195).
 musica("Tocando em Frente", "Almir Sater e Renato Teixeira", "Ao Vivo", "MPB", 215).
 musica("Apenas um Rapaz Latino-Americano", "Belchior", "Alucinação", "MPB", 230).
 musica("Cais", "Chico Buarque", "Chico Buarque", "MPB", 240).
@@ -77,7 +74,6 @@ musica("Sicko Mode", "Travis Scott", "Astroworld", "Rap", 312).
 musica("Lose Yourself", "Eminem", "8 Mile", "Rap", 326).
 musica("C.R.E.A.M.", "Wu-Tang Clan", "Enter the Wu-Tang", "Rap", 230).
 musica("Ms. Jackson", "OutKast", "Stankonia", "Rap", 242).
-musica("Smells Like Teen Spirit", "Nirvana", "Nevermind", "Rock", 301).
 musica("Hotel California", "Eagles", "Hotel California", "Rock", 391).
 musica("Sweet Child O' Mine", "Guns N' Roses", "Appetite for Destruction", "Rock", 356).
 musica("Back In Black", "AC/DC", "Back In Black", "Rock", 255).
@@ -132,7 +128,6 @@ musica("Anna Júlia", "Los Hermanos", "Los Hermanos", "Rock", 212).
 musica("Mulher de Fases", "Raimundos", "Só no Forévis", "Rock", 211).
 musica("Ciúme", "Ultraje a Rigor", "Nós Vamos Invadir Sua Praia", "Rock", 245).
 musica("A Dor Desse Amor", "KLB", "KLB", "Pop", 225).
-musica("Evidências", "Chitãozinho & Xororó", "Cowboy do Asfalto", "Sertanejo", 279).
 musica("É o Amor", "Zezé Di Camargo & Luciano", "Zezé Di Camargo & Luciano", "Sertanejo", 205).
 musica("Dormi na Praça", "Bruno & Marrone", "Acústico Ao Vivo", "Sertanejo", 170).
 musica("Pense em Mim", "Leandro & Leonardo", "Leandro & Leonardo Vol. 4", "Sertanejo", 199).
@@ -143,3 +138,46 @@ musica("Lágrimas e Chuva", "Kid Abelha", "Educação Sentimental", "Rock", 268)
 musica("Por Você", "Barão Vermelho", "Puro Êxtase", "Rock", 205).
 musica("Malandragem", "Cássia Eller", "Cássia Eller", "Rock", 247).
 musica("Exagerado", "Cazuza", "Exagerado", "Rock", 225).
+musica("Smells Like Teen Spirit", "Nirvana", "Nevermind", "Rock", 301).
+musica("Até Quando Esperar", "Plebe Rude", "O Concreto Já Rachou", "Rock", 267).
+musica("Under Pressure", "Queen & David Bowie", "Hot Space", "Rock", 248).
+musica("Last Nite", "The Strokes", "Is This It", "Rock", 193).
+musica("Toxic", "Britney Spears", "In the Zone", "Pop", 199).
+musica("Rolling in the Deep", "Adele", "21", "Pop", 228).
+musica("Crazy in Love", "Beyoncé ft. Jay-Z", "Dangerously in Love", "Pop", 236).
+musica("Penhasco.", "Luísa Sonza", "Doce 22", "Pop", 204).
+musica("...Baby One More Time", "Britney Spears", "...Baby One More Time", "Pop", 211).
+musica("Bang", "Anitta", "Bang!", "Pop", 190).
+musica("Mr. Brightside", "The Killers", "Hot Fuss", "Indie", 222).
+musica("The Less I Know The Better", "Tame Impala", "Currents", "Indie", 217).
+musica("Ho Hey", "The Lumineers", "The Lumineers", "Indie", 163).
+musica("Do I Wanna Know?", "Arctic Monkeys", "AM", "Indie", 272).
+musica("Somebody Else", "The 1975", "I like it when you sleep...", "Indie", 347).
+musica("One More Time", "Daft Punk", "Discovery", "Eletronica", 320).
+musica("Hear Me Now", "Alok, Bruno Martini, Zeeba", "Hear Me Now", "Eletronica", 193).
+musica("Strobe", "deadmau5", "For Lack of a Better Name", "Eletronica", 637).
+musica("Construção", "Chico Buarque", "Construção", "MPB", 385).
+musica("Andar com Fé", "Gilberto Gil", "Um Banda Um", "MPB", 197).
+musica("O Bêbado e a Equilibrista", "João Bosco", "Linha de Passe", "MPB", 199).
+musica("Gita", "Raul Seixas", "Gita", "MPB", 296).
+musica("Velha Roupa Colorida", "Belchior", "Alucinação", "MPB", 293).
+musica("Racionais MC's", "Diário de um Detento", "Sobrevivendo no Inferno", "Rap", 310).
+musica("N.Y. State of Mind", "Nas", "Illmatic", "HipHop", 294).
+musica("Vida Loka, Pt. 2", "Racionais MC's", "Nada como um Dia Após o Outro Dia", "Rap", 350).
+musica("Still D.R.E.", "Dr. Dre ft. Snoop Dogg", "2001", "HipHop", 270).
+musica("Jesus Chorou", "Racionais MC's", "Nada como um Dia Após o Outro Dia", "Rap", 471).
+musica("AmarElo", "Emicida, Majur & Pabllo Vittar", "AmarElo", "Rap", 336).
+musica("To Pimp a Butterfly", "Kendrick Lamar", "Alright", "HipHop", 219).
+musica("Só Zueira", "MC Leozinho", "Só Zueira", "Funk", 200).
+musica("Nosso Sonho", "Claudinho & Buchecha", "A Forma", "Funk", 307).
+musica("Boate Azul", "Bruno & Marrone", "Acústico Ao Vivo", "Sertanejo", 185).
+musica("Flor e o Beija-Flor", "Henrique & Juliano ft. Marília Mendonça", "Novas Histórias", "Sertanejo", 227).
+musica("Leão", "Marília Mendonça", "Decretos Reais", "Sertanejo", 175).
+musica("Ai Se Eu Te Pego", "Michel Teló", "Na Balada", "Sertanejo", 170).
+musica("Xote dos Milagres", "Falamansa", "Deixa Entrar...", "Forro", 260).
+musica("Espumas ao Vento", "Fagner", "Retratos", "Forro", 188).
+musica("Anunciação", "Alceu Valença", "Anunciação", "Forro", 311).
+musica("Minha Alma", "O Rappa", "Lado B Lado A", "Forro", 243).
+musica("Cheia de Manias", "Raça Negra", "Raça Negra Vol. 2", "Pagode", 214).
+musica("Deixa a Vida Me Levar", "Zeca Pagodinho", "Deixa a Vida Me Levar", "Pagode", 277).
+musica("Essa Tal Liberdade", "Só Pra Contrariar", "Só Pra Contrariar", "Pagode", 247).

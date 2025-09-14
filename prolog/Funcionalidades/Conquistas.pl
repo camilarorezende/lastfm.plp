@@ -4,7 +4,6 @@ conquistas_disponiveis([
     "100 minutos escutados!"
 ]).
 
-% === Regras para conquistas fixas ===
 conquista(Scrobbles, UsuarioEmail, "Primeiro Scrobble!") :-
     include(scrobble_do_usuario(UsuarioEmail), Scrobbles, Scs),
     length(Scs, N),

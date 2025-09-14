@@ -333,7 +333,6 @@ dict_para_musica_termo(Dict, musica(TituloS, ArtistaS, GeneroS)) :-
     dict_field_to_string(Dict.artista, ArtistaS),
     dict_field_to_string(Dict.genero, GeneroS).
 
-% Garante que o valor seja string
 dict_field_to_string(Value, Str) :-
     (   string(Value) -> Str = Value
     ;   atom(Value)   -> atom_string(Value, Str)
@@ -389,7 +388,7 @@ imprimir_rank_musicas([(musica(Titulo, Artista, _), Qnt)|T]) :-
     format('~w - ~w | Ouvidas: ~d~n', [Titulo, Artista, Qnt]),
     imprimir_rank_musicas(T).
 
-% imprimir ranking de gêneros
+
 imprimir_rank_generos([]).
 imprimir_rank_generos([(Genero, Qnt)|T]) :-
     format('~w | Ouvidas: ~d~n', [Genero, Qnt]),
@@ -452,75 +451,132 @@ verificar_compatibilidade(U1, U2, Compatibilidade) :-
     Compatibilidade is (CompG * 0.6) + (CompA * 0.4).
 
 
-genero_mais_ouvido(UsuarioEmail, GeneroMais) :-
-    carregar_scrobbles(TodosScrobbles),
-    include(scrobble_do_usuario(UsuarioEmail), TodosScrobbles, ScsUsuario),
-    findall(Genero, (member(S, ScsUsuario), get_dict(genero, S.musica, Genero)), Generos),
-    most_common(Generos, GeneroMais).
+genero_mais_ouvido(Email, GeneroMais) :-
+    carregar_scrobbles(Scrobbles),
+    include(scrobble_do_usuario(Email), Scrobbles, Historico),
+    findall(Genero, (
+        member(scrobble(_, Musica), Historico),
+        get_dict(genero, Musica, Genero)
+    ), Generos),
+    mapeia_contagem(Generos, Contagens),
+    sort(2, @>=, Contagens, [GeneroMais-_|_]) -> true ; GeneroMais = none.
+
+mapeia_contagem(Lista, Contagens) :-
+    msort(Lista, Ordenada),
+    encode_freq(Ordenada, Contagens).
+
+encode_freq([], []).
+encode_freq([H|T], [H-N|R]) :-
+    conta(H, T, N1, Restante),
+    N is N1 + 1,
+    encode_freq(Restante, R).
+
+conta(_, [], 0, []).
+conta(X, [X|T], N, Restante) :-
+    conta(X, T, N1, Restante),
+    N is N1 + 1.
+conta(X, [Y|T], 0, [Y|T]) :-
+    dif(X, Y).
 
 
-filtrar_nao_ouvidas([], _, []).
-filtrar_nao_ouvidas([M|Ms], TitulosOuvidos, NaoOuvidas) :-
-    get_dict(titulo, M, Titulo),
-    member(Titulo, TitulosOuvidos),
-    !,
-    filtrar_nao_ouvidas(Ms, TitulosOuvidos, NaoOuvidas).
-filtrar_nao_ouvidas([M|Ms], TitulosOuvidos, [M|NaoOuvidas]) :-
-    filtrar_nao_ouvidas(Ms, TitulosOuvidos, NaoOuvidas).
+filtrar_nao_ouvidas(Musicas, TitulosOuvidos, NaoOuvidas) :-
+    exclude([Musica]>>ja_ouviu(TitulosOuvidos, Musica), Musicas, NaoOuvidas).
+
+ja_ouviu(TitulosOuvidos, Musica) :-
+    get_dict(titulo, Musica, Titulo),
+    member(Titulo, TitulosOuvidos).
 
 
-recomendar_musicas(Usuario, Opcao, Parametro, Recomendacoes) :-
+
+% --------------------- RECOMENDAÇÕES ----------------------------
+
+filtra_genero_nao_ouvidas(GeneroStr, TitulosOuvidos, MusicaDict) :-
+    musica_tem_genero(GeneroStr, MusicaDict),
+    \+ ja_ouviu(TitulosOuvidos, MusicaDict).
+
+filtra_artista_nao_ouvidas(ArtistaStr, TitulosOuvidos, MusicaDict) :-
+    musica_tem_artista(ArtistaStr, MusicaDict),
+    \+ ja_ouviu(TitulosOuvidos, MusicaDict).
+
+filtra_generos_ouvidos_nao_ouvidas(GenerosUnicos, TitulosOuvidos, MusicaDict) :-
+    get_dict(genero, MusicaDict, GeneroMusica),
+    member(GeneroMusica, GenerosUnicos),
+    \+ ja_ouviu(TitulosOuvidos, MusicaDict).
+
+recomendar_musicas(Usuario, "1", GeneroStr, MusicasRecomendadas) :-
     carregar_musicas(Musicas),
     carregar_scrobbles(TodosScrobbles),
-
     include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
-  
-    findall(Musica, (member(S, HistoricoUsuario), get_dict(musica, S, Musica)), MusicasOuvidas),
-  
-    findall(Titulo, (member(M, MusicasOuvidas), get_dict(titulo, M, Titulo)), TitulosOuvidos),
+    findall(Titulo, (member(S, HistoricoUsuario), get_dict(musica, S, M), get_dict(titulo, M, Titulo)), TitulosOuvidos),
 
-    filtrar_nao_ouvidas(Musicas, TitulosOuvidos, NaoOuvidas),
+    include(
+        filtra_genero_nao_ouvidas(GeneroStr, TitulosOuvidos),
+        Musicas,
+        MusicasRecomendadas
+    ).
 
- 
-    (   Opcao == '1' -> % Por gênero
-        include(musica_tem_genero(Parametro), NaoOuvidas, Filtradas)
-    ;   Opcao == '2' -> % Por artista
-        include(musica_tem_artista(Parametro), NaoOuvidas, Filtradas)
-    ;   Opcao == '3' -> % Baseada no gênero mais ouvido
-        genero_mais_ouvido(Usuario.email, GeneroMais),
-        (GeneroMais \= none ->
-            include(musica_tem_genero(GeneroMais), NaoOuvidas, Filtradas)
-        ;
-            Filtradas = NaoOuvidas
-        )
-    ;   Filtradas = []
-    ),
+recomendar_musicas(Usuario, "2", ArtistaStr, MusicasRecomendadas) :-
+    carregar_musicas(Musicas),
+    carregar_scrobbles(TodosScrobbles),
+    include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
 
-    % Embaralha e seleciona até 3 recomendações
-    random_permutation(Filtradas, Embaralhadas),
-    take(3, Embaralhadas, Recomendacoes).
+    findall(Titulo,
+        (member(S, HistoricoUsuario),
+         get_dict(musica, S, M),
+         get_dict(titulo, M, Titulo)),
+        TitulosOuvidos),
 
+    include(filtra_artista_nao_ouvidas(ArtistaStr, TitulosOuvidos), Musicas, MusicasRecomendadas).
+
+recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
+    carregar_musicas(Musicas),
+    carregar_scrobbles(TodosScrobbles),
+    include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
+
+    findall(MusicaDict,
+        (member(S, HistoricoUsuario),
+         get_dict(musica, S, MusicaDict)),
+        MusicasOuvidasDict),
+
+    findall(Titulo,
+        (member(M_dict, MusicasOuvidasDict),
+         get_dict(titulo, M_dict, Titulo)),
+        TitulosOuvidos),
+
+    findall(Genero,
+        (member(M_dict, MusicasOuvidasDict),
+         get_dict(genero, M_dict, Genero)),
+        GenerosOuvidos),
+
+    list_to_set(GenerosOuvidos, GenerosUnicos),
+
+    include(filtra_generos_ouvidos_nao_ouvidas(GenerosUnicos, TitulosOuvidos), Musicas, MusicasRecomendadas).
+
+musica_ouvida_pelo_usuario(musica(T, A, Al, G, D), Historico) :-
+    member(musica(T, A, Al, G, D), Historico).
 
 
 genero_string_atom(String, Atom) :- atom_string(Atom, String).
 
-musica_tem_genero(GeneroDesejado, Musica) :-
-    ( get_dict(genero, Musica, GeneroMusica) ->
-        downcase_atom(GeneroMusica, GNorm1),
-        downcase_atom(GeneroDesejado, GNorm2),
-        GNorm1 = GNorm2
-    ; false
-    ).
+padronizar_texto(Texto, Padrao) :-
+    nonvar(Texto),
+    string(Texto),
+    normalize_space(string(TextoNormalizado), Texto),
+    string_lower(TextoNormalizado, Padrao).
 
+
+
+musica_tem_genero(GeneroDesejado, Musica) :-
+    get_dict(genero, Musica, GeneroMusica),
+    padronizar_texto(GeneroMusica, GNorm1),
+    padronizar_texto(GeneroDesejado, GNorm2),
+    GNorm1 == GNorm2.
 
 musica_tem_artista(ArtistaDesejado, Musica) :-
-    ( get_dict(artista, Musica, ArtistaMusica) ->
-        downcase_atom(ArtistaMusica, ANorm1),
-        downcase_atom(ArtistaDesejado, ANorm2),
-        ANorm1 = ANorm2
-    ; false
-    ).
-
+    get_dict(artista, Musica, ArtistaMusica),
+    padronizar_texto(ArtistaMusica, ANorm1),
+    padronizar_texto(ArtistaDesejado, ANorm2),
+    ANorm1 == ANorm2.
 
 
 escolher_genero(GeneroEscolhido) :-
@@ -600,10 +656,12 @@ item_contagem(Lista, (Item, Contagem)) :-
     Lista = [Item|_],
     length(Lista, Contagem).
 
-take(N, _, Xs) :- N =< 0, !, Xs = [].
-take(_, [], []).
-take(N, [X|Xs], [X|Ys]) :-
+take(0, _, []) :- !.
+take(_, [], []) :- !.
+take(N, [H|T], [H|R]) :-
+    N > 0,
     N1 is N - 1,
-    take(N1, Xs, Ys).
+    take(N1, T, R).
+
 
 usuario_para_dict(usuario(Nome, Email, Senha, Conqs), usuario{nome:Nome, email:Email, senha:Senha, conquistas:Conqs}).

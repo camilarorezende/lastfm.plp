@@ -1,4 +1,3 @@
-% Eletrônica
 musica("Titanium", "David Guetta", "Nothing but the Beat", "Eletronica", 245).
 musica("Animals", "Martin Garrix", "Animals", "Eletronica", 320).
 musica("Wake Me Up", "Avicii", "True", "Eletronica", 247).
@@ -9,8 +8,6 @@ musica("Don't You Worry Child", "Swedish House Mafia", "Until Now", "Eletronica"
 musica("Scary Monsters and Nice Sprites", "Skrillex", "Scary Monsters and Nice Sprites", "Eletronica", 224).
 musica("Get Lucky", "Daft Punk", "Random Access Memories", "Eletronica", 369).
 musica("Firestone", "Kygo", "Cloud Nine", "Eletronica", 238).
-
-% Forró
 musica("Anunciação", "Alceu Valença", "Anunciação", "Forro", 255).
 musica("Xote das Meninas", "Luiz Gonzaga", "Luiz Gonzaga", "Forro", 210).
 musica("Asa Branca", "Luiz Gonzaga", "Asa Branca", "Forro", 185).
@@ -21,8 +18,6 @@ musica("Olha pro Céu", "Luiz Gonzaga", "Luiz Gonzaga", "Forro", 210).
 musica("Esperando na Janela", "Gilberto Gil", "Banda Larga Cordel", "Forro", 240).
 musica("Sabiá", "Chico Buarque e Tom Jobim", "Sabiá", "Forro", 225).
 musica("Eu e Minha Ex", "Wesley Safadão", "WS em Casa", "Forro", 215).
-
-% Funk
 musica("Rap da Felicidade", "Cidinho e Doca", "Rap da Felicidade", "Funk", 300).
 musica("Vai Malandra", "Anitta", "Vai Malandra", "Funk", 210).
 musica("Baile de Favela", "MC João", "Baile de Favela", "Funk", 190).
@@ -33,8 +28,6 @@ musica("Tô Querendo", "MC Kekel", "Tô Querendo", "Funk", 215).
 musica("Sentadão", "Pedro Sampaio", "Sentadão", "Funk", 205).
 musica("Agora Vai Sentar", "MCs Jhowzinho e Kadinho", "Agora Vai Sentar", "Funk", 200).
 musica("Ta Tum Tum", "MC Kevinho", "Ta Tum Tum", "Funk", 195).
-
-% HipHop
 musica("Lose Yourself", "Eminem", "8 Mile", "HipHop", 326).
 musica("Juicy", "The Notorious B.I.G.", "Ready to Die", "HipHop", 300).
 musica("C.R.E.A.M.", "Wu-Tang Clan", "Enter the Wu-Tang", "HipHop", 230).
@@ -45,8 +38,6 @@ musica("99 Problems", "Jay-Z", "The Black Album", "HipHop", 213).
 musica("Gold Digger", "Kanye West", "Late Registration", "HipHop", 245).
 musica("God's Plan", "Drake", "Scorpion", "HipHop", 198).
 musica("Ms. Jackson", "OutKast", "Stankonia", "HipHop", 242).
-
-% Indie
 musica("Fluorescent Adolescent", "Arctic Monkeys", "Favourite Worst Nightmare", "Indie", 182).
 musica("Take Me Out", "Franz Ferdinand", "Franz Ferdinand", "Indie", 238).
 musica("Pumped Up Kicks", "Foster the People", "Torches", "Indie", 238).
@@ -57,8 +48,6 @@ musica("Kids", "MGMT", "Oracular Spectacular", "Indie", 265).
 musica("Reptilia", "The Strokes", "Room on Fire", "Indie", 210).
 musica("Little Lion Man", "Mumford & Sons", "Sigh No More", "Indie", 245).
 musica("Helena Beat", "Foster the People", "Torches", "Indie", 240).
-
-% MPB
 musica("Aquarela do Brasil", "Ary Barroso", "Aquarela do Brasil", "MPB", 180).
 musica("Garota de Ipanema", "Tom Jobim e Vinicius de Moraes", "Getz/Gilberto", "MPB", 210).
 musica("Chega de Saudade", "João Gilberto", "Chega de Saudade", "MPB", 170).
@@ -70,8 +59,6 @@ musica("Roda Viva", "Chico Buarque", "Roda Viva", "MPB", 200).
 musica("Asa Branca", "Luiz Gonzaga", "Asa Branca", "MPB", 185).
 musica("Sampa", "Caetano Veloso", "Caetano Veloso", "MPB", 225).
 musica("Detalhes", "Roberto Carlos", "Detalhes", "MPB", 230).
-
-% Pagode
 musica("Telegrama", "Zeca Pagodinho", "Deixa Clarear", "Pagode", 210).
 musica("Deixa Acontecer", "Grupo Revelação", "Deixa Acontecer", "Pagode", 195).
 musica("Pra Você Acreditar", "Sorriso Maroto", "É Diferente", "Pagode", 200).
@@ -82,8 +69,6 @@ musica("Te Amo", "Raça Negra", "Raça Negra", "Pagode", 240).
 musica("Livre Pra Voar", "Exaltasamba", "Livre Pra Voar", "Pagode", 210).
 musica("Tô Te Filmando", "Grupo Menos é Mais", "Ao Vivo", "Pagode", 205).
 musica("Pimpolho", "Art Popular", "Coração da Nação", "Pagode", 195).
-
-% Pop
 musica("Shape of You", "Ed Sheeran", "Divide", "Pop", 240).
 musica("Blinding Lights", "The Weeknd", "After Hours", "Pop", 200).
 musica("Uptown Funk", "Mark Ronson ft. Bruno Mars", "Uptown Special", "Pop", 270).
@@ -94,11 +79,8 @@ musica("Roar", "Katy Perry", "Prism", "Pop", 222).
 musica("Shallow", "Lady Gaga & Bradley Cooper", "A Star Is Born", "Pop", 215).
 musica("Sorry", "Justin Bieber", "Purpose", "Pop", 200).
 musica("Bad Guy", "Billie Eilish", "When We All Fall Asleep, Where Do We Go?", "Pop", 194).
-
-% Rap
 musica("God's Plan", "Drake", "Scorpion", "Rap", 198).
 musica("Sicko Mode", "Travis Scott", "Astroworld", "Rap", 312).
-musica("HUMBLE.", "Kendrick Lamar", "DAMN.", "Rap", 177).
 musica("Lose Yourself", "Eminem", "8 Mile", "Rap", 326).
 musica("Juicy", "The Notorious B.I.G.", "Ready to Die", "Rap", 300).
 musica("N.Y. State of Mind", "Nas", "Illmatic", "Rap", 296).
@@ -106,8 +88,6 @@ musica("C.R.E.A.M.", "Wu-Tang Clan", "Enter the Wu-Tang", "Rap", 230).
 musica("99 Problems", "Jay-Z", "The Black Album", "Rap", 213).
 musica("Gold Digger", "Kanye West", "Late Registration", "Rap", 245).
 musica("Ms. Jackson", "OutKast", "Stankonia", "Rap", 242).
-
-% Rock
 musica("Smells Like Teen Spirit", "Nirvana", "Nevermind", "Rock", 301).
 musica("Bohemian Rhapsody", "Queen", "A Night at the Opera", "Rock", 354).
 musica("Hotel California", "Eagles", "Hotel California", "Rock", 391).
@@ -118,8 +98,6 @@ musica("Wonderwall", "Oasis", "(What's the Story) Morning Glory?", "Rock", 258).
 musica("Livin' On A Prayer", "Bon Jovi", "Slippery When Wet", "Rock", 250).
 musica("Paint It Black", "The Rolling Stones", "Aftermath", "Rock", 200).
 musica("Enter Sandman", "Metallica", "Metallica", "Rock", 331).
-
-% Sertanejo
 musica("Evidencias", "Chitãozinho e Xororó", "Evidencias", "Sertanejo", 265).
 musica("Atras da Porta", "Zezé Di Camargo & Luciano", "Zezé Di Camargo & Luciano", "Sertanejo", 245).
 musica("Fio de Cabelo", "Chitãozinho e Xororó", "Fio de Cabelo", "Sertanejo", 230).
@@ -130,4 +108,10 @@ musica("Camaro Amarelo", "Munhoz & Mariano", "Camaro Amarelo", "Sertanejo", 205)
 musica("Vidro Fumê", "Simone & Simaria", "Vidro Fumê", "Sertanejo", 240).
 musica("Largado às Traças", "Zé Neto & Cristiano", "Largado às Traças", "Sertanejo", 260).
 musica("Homem de Família", "Gusttavo Lima", "Homem de Família", "Sertanejo", 235).
-
+musica('Tears in Heaven', 'Eric Clapton', 'Unplugged', 'Rock', 276).
+musica('November Rain', 'Guns N Roses', 'Use Your Illusion I', 'Rock', 548).
+musica('Bohemian Rhapsody', 'Queen', 'A Night at the Opera', 'Rock', 355).
+musica('Shape of You', 'Ed Sheeran', '÷', 'Pop', 233).
+musica('Billie Jean', 'Michael Jackson', 'Thriller', 'Pop', 294).
+musica('Desejo de Amar', 'Exaltasamba', 'Ao Vivo', 'Pagode', 254).
+musica('Sozinho', 'Caetano Veloso', 'Oma', 'MPB', 241).

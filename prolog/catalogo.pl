@@ -103,3 +103,43 @@ musica("Shape of You", "Ed Sheeran", "÷", "Pop", 233).
 musica("Billie Jean", "Michael Jackson", "Thriller", "Pop", 294).
 musica("Desejo de Amar", "Exaltasamba", "Ao Vivo", "Pagode", 254).
 musica("Sozinho", "Caetano Veloso", "Oma", "MPB", 241).
+musica("What Makes You Beautiful", "One Direction", "Up All Night", "Pop", 199).
+musica("Story of My Life", "One Direction", "Midnight Memories", "Pop", 245).
+musica("Drag Me Down", "One Direction", "Made in the A.M.", "Pop", 192).
+musica("Night Changes", "One Direction", "Four", "Pop", 227).
+musica("Perfect", "One Direction", "Made in the A.M.", "Pop", 230).
+musica("Bad Romance", "Lady Gaga", "The Fame Monster", "Pop", 295).
+musica("Poker Face", "Lady Gaga", "The Fame", "Pop", 236).
+musica("Just Dance", "Lady Gaga", "The Fame", "Pop", 242).
+musica("As It Was", "Harry Styles", "Harry's House", "Pop", 167).
+musica("Watermelon Sugar", "Harry Styles", "Fine Line", "Pop", 174).
+musica("Sign of the Times", "Harry Styles", "Harry Styles", "Rock", 341).
+musica("Adore You", "Harry Styles", "Fine Line", "Pop", 218).
+musica("Two of Us", "Louis Tomlinson", "Walls", "Pop", 217).
+musica("Back to You", "Louis Tomlinson", "Single", "Pop", 190).
+musica("Slow Hands", "Niall Horan", "Flicker", "Pop", 188).
+musica("This Town", "Niall Horan", "Flicker", "Pop", 232).
+musica("Pillowtalk", "Zayn Malik", "Mind of Mine", "Pop", 203).
+musica("Dusk Till Dawn", "Zayn Malik ft. Sia", "Single", "Pop", 239).
+musica("Strip That Down", "Liam Payne ft. Quavo", "LP1", "Pop", 204).
+musica("For You", "Liam Payne & Rita Ora", "Fifty Shades Freed Soundtrack", "Pop", 245).
+musica("Como Nossos Pais", "Elis Regina", "Falso Brilhante", "MPB", 271).
+musica("Águas de Março", "Tom Jobim & Elis Regina", "Elis & Tom", "MPB", 212).
+musica("Meu Erro", "Os Paralamas do Sucesso", "O Passo do Lui", "Rock", 208).
+musica("Pais e Filhos", "Legião Urbana", "As Quatro Estações", "Rock", 308).
+musica("Eduardo e Mônica", "Legião Urbana", "Dois", "Rock", 270).
+musica("Anna Júlia", "Los Hermanos", "Los Hermanos", "Rock", 212).
+musica("Mulher de Fases", "Raimundos", "Só no Forévis", "Rock", 211).
+musica("Ciúme", "Ultraje a Rigor", "Nós Vamos Invadir Sua Praia", "Rock", 245).
+musica("A Dor Desse Amor", "KLB", "KLB", "Pop", 225).
+musica("Evidências", "Chitãozinho & Xororó", "Cowboy do Asfalto", "Sertanejo", 279).
+musica("É o Amor", "Zezé Di Camargo & Luciano", "Zezé Di Camargo & Luciano", "Sertanejo", 205).
+musica("Dormi na Praça", "Bruno & Marrone", "Acústico Ao Vivo", "Sertanejo", 170).
+musica("Pense em Mim", "Leandro & Leonardo", "Leandro & Leonardo Vol. 4", "Sertanejo", 199).
+musica("Festa no Apê", "Latino", "Festa no Apê", "Pop", 238).
+musica("Glamurosa", "MC Marcinho", "Funk Mix", "Funk", 253).
+musica("Só Love", "Claudinho & Buchecha", "A Forma", "Funk", 210).
+musica("Lágrimas e Chuva", "Kid Abelha", "Educação Sentimental", "Rock", 268).
+musica("Por Você", "Barão Vermelho", "Puro Êxtase", "Rock", 205).
+musica("Malandragem", "Cássia Eller", "Cássia Eller", "Rock", 247).
+musica("Exagerado", "Cazuza", "Exagerado", "Rock", 225).

@@ -342,14 +342,14 @@ scrobble_do_usuario(Email, Sc) :-
     ( atom(Email) -> atom_string(Email, ES) ; ES = Email ),
     string_lower(ES, L1), string_lower(E, L2), L1 == L2.
 
-compare_scrobbles(>, A, B) :- A.scrobbles >  B.scrobbles.
-compare_scrobbles(<, A, B) :- A.scrobbles <  B.scrobbles.
+compare_scrobbles(<, A, B) :- A.scrobbles >  B.scrobbles.
+compare_scrobbles(>, A, B) :- A.scrobbles <  B.scrobbles.
 compare_scrobbles(=, _, _).
 
 imprime_rank_global([], _).
 imprime_rank_global([S|T], Pos) :-
     format('~d. ~w (~w) - ~d scrobble(s)~n', [Pos, S.nome, S.email, S.scrobbles]),
-    Pos1 is Pos + 1,
+    Pos1 is Pos - 1,
     imprime_rank_global(T, Pos1).
 imprime_rank_global(R) :- imprime_rank_global(R, 1).
 

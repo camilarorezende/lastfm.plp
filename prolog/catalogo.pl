@@ -69,7 +69,6 @@ musica("Te Amo", "Raça Negra", "Raça Negra", "Pagode", 240).
 musica("Livre Pra Voar", "Exaltasamba", "Livre Pra Voar", "Pagode", 210).
 musica("Tô Te Filmando", "Grupo Menos é Mais", "Ao Vivo", "Pagode", 205).
 musica("Pimpolho", "Art Popular", "Coração da Nação", "Pagode", 195).
-musica("Shape of You", "Ed Sheeran", "Divide", "Pop", 240).
 musica("Blinding Lights", "The Weeknd", "After Hours", "Pop", 200).
 musica("Uptown Funk", "Mark Ronson ft. Bruno Mars", "Uptown Special", "Pop", 270).
 musica("Happy", "Pharrell Williams", "G I R L", "Pop", 233).
@@ -108,10 +107,10 @@ musica("Camaro Amarelo", "Munhoz & Mariano", "Camaro Amarelo", "Sertanejo", 205)
 musica("Vidro Fumê", "Simone & Simaria", "Vidro Fumê", "Sertanejo", 240).
 musica("Largado às Traças", "Zé Neto & Cristiano", "Largado às Traças", "Sertanejo", 260).
 musica("Homem de Família", "Gusttavo Lima", "Homem de Família", "Sertanejo", 235).
-musica('Tears in Heaven', 'Eric Clapton', 'Unplugged', 'Rock', 276).
-musica('November Rain', 'Guns N Roses', 'Use Your Illusion I', 'Rock', 548).
-musica('Bohemian Rhapsody', 'Queen', 'A Night at the Opera', 'Rock', 355).
-musica('Shape of You', 'Ed Sheeran', '÷', 'Pop', 233).
-musica('Billie Jean', 'Michael Jackson', 'Thriller', 'Pop', 294).
-musica('Desejo de Amar', 'Exaltasamba', 'Ao Vivo', 'Pagode', 254).
-musica('Sozinho', 'Caetano Veloso', 'Oma', 'MPB', 241).
+musica("Tears in Heaven", "Eric Clapton", "Unplugged", "Rock", 276).
+musica("November Rain", "Guns N Roses", "Use Your Illusion I", "Rock", 548).
+musica("Bohemian Rhapsody", "Queen", "A Night at the Opera", "Rock", 355).
+musica("Shape of You", "Ed Sheeran", "÷", "Pop", 233).
+musica("Billie Jean", "Michael Jackson", "Thriller", "Pop", 294).
+musica("Desejo de Amar", "Exaltasamba", "Ao Vivo", "Pagode", 254).
+musica("Sozinho", "Caetano Veloso", "Oma", "MPB", 241).

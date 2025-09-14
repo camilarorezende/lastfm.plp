@@ -503,54 +503,136 @@ filtra_generos_ouvidos_nao_ouvidas(GenerosUnicos, TitulosOuvidos, MusicaDict) :-
     member(GeneroMusica, GenerosUnicos),
     \+ ja_ouviu(TitulosOuvidos, MusicaDict).
 
-recomendar_musicas(Usuario, "1", GeneroStr, MusicasRecomendadas) :-
-    carregar_musicas(Musicas),
-    carregar_scrobbles(TodosScrobbles),
-    include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
-    findall(Titulo, (member(S, HistoricoUsuario), get_dict(musica, S, M), get_dict(titulo, M, Titulo)), TitulosOuvidos),
 
-    include(
-        filtra_genero_nao_ouvidas(GeneroStr, TitulosOuvidos),
-        Musicas,
-        MusicasRecomendadas
-    ).
+recomendar_musicas(_Usuario, "1", Genero, MusicasRecomendadas) :-
+    carregar_musicas(TodasMusicas),
+    % AQUI: Usando o predicado correto
+    include(musica_tem_genero(Genero), TodasMusicas, Candidatas),
+    length(Candidatas, L),
+    N is min(3, L),
+    sublist(Candidatas, N, MusicasRecomendadas).
 
-recomendar_musicas(Usuario, "2", ArtistaStr, MusicasRecomendadas) :-
-    carregar_musicas(Musicas),
-    carregar_scrobbles(TodosScrobbles),
-    include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
+recomendar_musicas(_Usuario, "2", Artista, MusicasRecomendadas) :-
+    carregar_musicas(TodasMusicas),
+    include(musica_tem_artista(Artista), TodasMusicas, Candidatas),
+    length(Candidatas, L),
+    N is min(3, L),
+    sublist(Candidatas, N, MusicasRecomendadas).
 
-    findall(Titulo,
-        (member(S, HistoricoUsuario),
-         get_dict(musica, S, M),
-         get_dict(titulo, M, Titulo)),
-        TitulosOuvidos),
-
-    include(filtra_artista_nao_ouvidas(ArtistaStr, TitulosOuvidos), Musicas, MusicasRecomendadas).
 
 recomendar_musicas(Usuario, "3", _Parametro, MusicasRecomendadas) :-
-    carregar_musicas(Musicas),
+    carregar_musicas(TodasAsMusicas),
     carregar_scrobbles(TodosScrobbles),
+
     include(scrobble_do_usuario(Usuario.email), TodosScrobbles, HistoricoUsuario),
 
-    findall(MusicaDict,
-        (member(S, HistoricoUsuario),
-         get_dict(musica, S, MusicaDict)),
-        MusicasOuvidasDict),
+    generos_mais_ouvidos(HistoricoUsuario, GenerosOrdenados),
+    extrair_titulos_ouvidos(HistoricoUsuario, TitulosOuvidos),
 
-    findall(Titulo,
-        (member(M_dict, MusicasOuvidasDict),
-         get_dict(titulo, M_dict, Titulo)),
-        TitulosOuvidos),
+    include(
+        eh_musica_mais_ouvida_genero(TitulosOuvidos, GenerosOrdenados),
+        TodasAsMusicas,
+        Candidatas
+    ),
 
-    findall(Genero,
-        (member(M_dict, MusicasOuvidasDict),
-         get_dict(genero, M_dict, Genero)),
-        GenerosOuvidos),
+    length(Candidatas, L),
+    N is min(3, L),
+    sublist(Candidatas, N, MusicasRecomendadas).
+ 
 
-    list_to_set(GenerosOuvidos, GenerosUnicos),
+extrair_titulos_ouvidos(Historico, Titulos) :-
+    findall(TituloLower, (
+        member(S, Historico),
+        get_dict(musica, S, M),
+        get_dict(titulo, M, Titulo),
+        atom_string(Titulo, TStr),
+        string_lower(TStr, TituloLower)
+    ), TitulosList),
+    list_to_set(TitulosList, Titulos).
 
-    include(filtra_generos_ouvidos_nao_ouvidas(GenerosUnicos, TitulosOuvidos), Musicas, MusicasRecomendadas).
+eh_musica_mais_ouvida_genero(TitulosOuvidos, GenerosPreferidos, Musica) :-
+    get_dict(titulo, Musica, T),
+    atom_string(T, TStr),
+    string_lower(TStr, TLower),
+    \+ member(TLower, TitulosOuvidos),
+
+    get_dict(genero, Musica, G),
+    atom_string(G, GStr),
+    string_lower(GStr, GLower),
+    member(GLower, GenerosPreferidos).
+
+extrair_titulos_e_generos_do_historico(Historico, Titulos, Generos) :-
+    findall(MusicaDict, (
+        member(S, Historico),
+        get_dict(musica, S, MusicaDict)
+    ), MusicasOuvidasDict),
+
+    findall(TituloLower, (
+        member(M_dict, MusicasOuvidasDict),
+        get_dict(titulo, M_dict, Titulo),
+        atom_string(TituloAtom, Titulo),
+        string_lower(TituloAtom, TituloLower)
+    ), TitulosUnicos),
+
+    findall(GeneroLower, (
+        member(M_dict, MusicasOuvidasDict),
+        get_dict(genero, M_dict, Genero),
+        atom_string(GeneroAtom, Genero),
+        string_lower(GeneroAtom, GeneroLower)
+    ), GenerosUnicosList),
+
+    list_to_set(TitulosUnicos, Titulos),
+    list_to_set(GenerosUnicosList, Generos).
+
+eh_musica_recomendada(TitulosOuvidos, GenerosOuvidos, Musica) :-
+    get_dict(genero, Musica, Genero),
+    atom_string(GeneroAtom, Genero),
+    string_lower(GeneroAtom, GeneroLower),
+    member(GeneroLower, GenerosOuvidos),
+
+    get_dict(titulo, Musica, Titulo),
+    atom_string(TituloAtom, Titulo),
+    string_lower(TituloAtom, TituloLower),
+    \+ member(TituloLower, TitulosOuvidos).
+
+generos_mais_ouvidos(Historico, GenerosOrdenados) :-
+    findall(GeneroLower, (
+        member(S, Historico),
+        get_dict(musica, S, MusicaDict),
+        get_dict(genero, MusicaDict, Genero),
+        (atom(Genero) -> atom_string(Genero, GeneroStr) ; GeneroStr = Genero),
+        string_lower(GeneroStr, GeneroLower)
+    ), Generos),
+
+    sort(Generos, GenerosUnicos),
+    findall(Freq-Genero,
+        (member(Genero, GenerosUnicos), count_occurrences(Genero, Generos, Freq)),
+        Frequencias),
+
+    sort(1, @>=, Frequencias, Ordenadas),  
+    pairs_values(Ordenadas, GenerosOrdenados).  
+
+count_occurrences(Elem, Lista, Count) :-
+    include(==(Elem), Lista, Filtrada),
+    length(Filtrada, Count).
+
+
+
+musica_do_genero(Genero, Musica) :-
+    get_dict(genero, Musica, Genero).
+
+musica_do_artista(Artista, Musica) :-
+    get_dict(artista, Musica, Artista).
+
+
+sublist_aleatoria(Lista, N, Sublist) :-
+    random_permutation(Lista, PermutedList),
+    sublist(PermutedList, N, Sublist).
+
+
+sublist(List, N, Sublist) :-
+    length(Sublist, N),
+    append(Sublist, _, List).
 
 musica_ouvida_pelo_usuario(musica(T, A, Al, G, D), Historico) :-
     member(musica(T, A, Al, G, D), Historico).
@@ -559,10 +641,10 @@ musica_ouvida_pelo_usuario(musica(T, A, Al, G, D), Historico) :-
 genero_string_atom(String, Atom) :- atom_string(Atom, String).
 
 padronizar_texto(Texto, Padrao) :-
-    nonvar(Texto),
-    string(Texto),
-    normalize_space(string(TextoNormalizado), Texto),
-    string_lower(TextoNormalizado, Padrao).
+    ( atom(Texto) -> atom_string(Texto, TextoStr) ; TextoStr = Texto ),   
+    split_string(TextoStr, "\n\r\t ", "\n\r\t ", Parts),
+    atomics_to_string(Parts, "", SemEspacos),
+    string_lower(SemEspacos, Padrao).
 
 
 
@@ -577,6 +659,7 @@ musica_tem_artista(ArtistaDesejado, Musica) :-
     padronizar_texto(ArtistaMusica, ANorm1),
     padronizar_texto(ArtistaDesejado, ANorm2),
     ANorm1 == ANorm2.
+
 
 
 escolher_genero(GeneroEscolhido) :-

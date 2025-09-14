@@ -1,5 +1,6 @@
 :- consult('../Funcionalidades/Funcionalidades.pl').
 :- debug(login).
+:- use_module(library(strings)).
 
 inicializar :-
     carregar_usuarios_json,
@@ -134,17 +135,28 @@ menu_usuario_opcao("4", Usuario) :-
     menu_usuario_logado(Usuario).
 
 menu_usuario_opcao("5", Usuario) :-
-     writeln('\nEscolha o tipo de recomendação:'),
-    writeln('1 - Por gênero'), writeln('2 - Por artista'), writeln('3 - Baseada no histórico'),
+    writeln('\nEscolha o tipo de recomendação:'),
+    writeln('1 - Por gênero'),
+    writeln('2 - Por artista'),
+    writeln('3 - Baseada no histórico'),
     write('Escolha uma opção: '), flush_output,
-    read_line_to_string(user_input, TipoStr),
-    (   member(TipoStr, ["1","2","3"]) ->
-        (   TipoStr == "1" ->
-            escolher_genero(Parametro)
-        ;   TipoStr == "2" ->
-            write('\nDigite o nome do artista: '), flush_output,
-            read_line_to_string(user_input, Parametro)
-        ;   Parametro = ""
+
+    read_line_to_string(user_input, RawTipoStr),
+    split_string(RawTipoStr, "\n\r\t ", "\n\r\t ", Parts),
+    atomics_to_string(Parts, "", TipoStr),
+
+    (   member(TipoStr, ["1", "2", "3"]) ->
+        (
+            ( TipoStr == "1" ->
+                escolher_genero(Parametro)
+            ; TipoStr == "2" ->
+                write('\nDigite o nome do artista: '), flush_output,
+                read_line_to_string(user_input, RawParametro),
+                split_string(RawParametro, "\n\r\t ", "\n\r\t ", ParametroParts),
+                atomics_to_string(ParametroParts, "", Parametro)
+            ; TipoStr == "3" ->
+                Parametro = ""
+            )
         ),
         recomendar_musicas(Usuario, TipoStr, Parametro, Musicas),
         (   Musicas = [] ->
@@ -158,6 +170,7 @@ menu_usuario_opcao("5", Usuario) :-
     ;   writeln('Opção inválida! Tente novamente.')
     ),
     menu_usuario_logado(Usuario).
+
 
 menu_usuario_opcao("6", UsuarioDict) :-
     writeln('Digite o email do outro usuário para comparar:'),

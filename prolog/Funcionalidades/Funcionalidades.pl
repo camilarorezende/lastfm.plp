@@ -286,15 +286,27 @@ estatisticas_globais :-
 
 gerar_ranking_pessoal(UsuarioEmail) :-
     carregar_scrobbles(Scrobbles),
+    
     % Filtra scrobbles do usuário corretamente:
-    findall(Musica, (member(Scrobble, Scrobbles), get_dict(emailUsuario, Scrobble, Email), string_lower(Email, EL), string_lower(UsuarioEmail, UL), EL == UL, get_dict(musica, Scrobble, Musica)), MusicasOuvidas),
-    ( MusicasOuvidas = [] ->
+    findall(MusicaDict,
+            (member(Scrobble, Scrobbles),
+             get_dict(emailUsuario, Scrobble, Email),
+             string_lower(Email, EL),
+             string_lower(UsuarioEmail, UL),
+             EL == UL,
+             get_dict(musica, Scrobble, MusicaDict)),
+            MusicasOuvidasDicts),
+    
+    ( MusicasOuvidasDicts == [] ->
         writeln('Você ainda não tem nenhum scrobble :( Que tal dar play em alguma música? ;)')
     ; 
+    
+        maplist(dict_para_musica_termo, MusicasOuvidasDicts, MusicasOuvidas),
+        
         contar_frequencias(MusicasOuvidas, ContagemMusicas),
         ordenar_por_valor_decrescente(ContagemMusicas, RankMusicas),
 
-        findall(Genero, (member(M, MusicasOuvidas), musica_genero(M, Genero)), Generos),
+        findall(Genero, (member(musica(_, _, Genero), MusicasOuvidas)), Generos),
         contar_frequencias(Generos, ContagemGeneros),
         ordenar_por_valor_decrescente(ContagemGeneros, RankGeneros),
 
@@ -305,32 +317,61 @@ gerar_ranking_pessoal(UsuarioEmail) :-
         imprimir_rank_generos(RankGeneros)
     ).
 
+dict_para_musica_termo(Dict, musica(TituloS, ArtistaS, GeneroS)) :-
+    dict_field_to_string(Dict.titulo, TituloS),
+    dict_field_to_string(Dict.artista, ArtistaS),
+    dict_field_to_string(Dict.genero, GeneroS).
+
+% Garante que o valor seja string
+dict_field_to_string(Value, Str) :-
+    (   string(Value) -> Str = Value
+    ;   atom(Value)   -> atom_string(Value, Str)
+    ;   number(Value) -> number_string(Value, Str)
+    ;   Str = ""  % fallback
+    ).
+
+
 musica_genero(musica(_, _, Genero), Genero).
 
+
 contar_frequencias(Lista, Contagem) :-
-    contar_frequencias(Lista, [], Contagem).
+    setof((X, N), 
+          aggregate(count, member(X, Lista), N), 
+          Contagem).
 
-contar_frequencias([], Acc, Acc).
-contar_frequencias([X|Xs], Acc, Contagem) :-
-    incrementa_ou_adiciona(X, Acc, NovoAcc),
-    contar_frequencias(Xs, NovoAcc, Contagem).
 
-incrementa_ou_adiciona(X, [], [(X,1)]).
-incrementa_ou_adiciona(X, [(X,N)|T], [(X,N1)|T]) :- N1 is N + 1.
+incrementa_ou_adiciona(X, [], [(X,1)]) :-
+    format("Adicionando nova música: ~w~n", [X]).
+
+incrementa_ou_adiciona(X, [(Y,N)|T], [(Y,N1)|T]) :-
+    X == Y,
+    N1 is N + 1,
+    format("Incrementando contagem de música: ~w (de ~d para ~d)~n", [X, N, N1]).
+
 incrementa_ou_adiciona(X, [H|T], [H|NT]) :-
-    H = (Y,_), X \= Y,
+    H = (Y,_),
+    X \== Y,
     incrementa_ou_adiciona(X, T, NT).
 
-% ordenar_por_valor_decrescente(+Lista, -ListaOrdenada)
-% Ordena lista de pares (Chave, Valor) por Valor decrescente
 ordenar_por_valor_decrescente(Lista, Ordenada) :-
     predsort(compara_valor_decrescente, Lista, Ordenada).
 
-compara_valor_decrescente(Delta, (_,V1), (_,V2)) :-
+compara_valor_decrescente(Delta, (X, V1), (Y, V2)) :-
     ( V1 > V2 -> Delta = '<'
     ; V1 < V2 -> Delta = '>'
-    ; Delta = '='
+    ; 
+      % Se valores iguais, compara os nomes (se for musica, compara título; se for átomo/string, compara diretamente)
+      compara_empate(X, Y, Delta)
     ).
+
+compara_empate(musica(T1, _, _), musica(T2, _, _), Delta) :-
+    compare(Delta, T1, T2).
+
+compara_empate(X, Y, Delta) :-
+    % Caso X e Y não sejam musica(...), compara diretamente
+    compare(Delta, X, Y).
+
+
 
 imprimir_rank_musicas([]).
 imprimir_rank_musicas([(musica(Titulo, Artista, _), Qnt)|T]) :-
@@ -430,8 +471,6 @@ recomendar_musicas(Usuario, Opcao, Parametro, Recomendacoes) :-
 
     random_permutation(Filtradas, Embaralhadas),
     take(3, Embaralhadas, Recomendacoes).
-
-scrobble_do_usuario(Email, Scrobble) :- Scrobble.emailUsuario == Email.
 
 genero_string_atom(String, Atom) :- atom_string(Atom, String).
 

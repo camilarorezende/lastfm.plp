@@ -210,7 +210,7 @@ adicionar_conquista(Email, Conquista) :-
         retract(usuario(Nome, Email, Senha, Conqs)),
         assertz(usuario(Nome, Email, Senha, [Conquista|Conqs])),
         salvar_usuarios_json,
-        writeln('Conquista adicionada com sucesso!')
+        writeln('Nova conquista desbloqueada!')
     ), !.
 adicionar_conquista(_, _) :-
     writeln('Usuário não encontrado.').

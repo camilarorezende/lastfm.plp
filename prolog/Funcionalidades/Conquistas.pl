@@ -1,7 +1,7 @@
 conquistas_disponiveis([
     "Primeiro Scrobble!",
-    "10 músicas ouvidas",
-    "100 minutos escutados"
+    "10 músicas ouvidas!",
+    "100 minutos escutados!"
 ]).
 
 % === Regras para conquistas fixas ===
@@ -10,12 +10,12 @@ conquista(Scrobbles, UsuarioEmail, "Primeiro Scrobble!") :-
     length(Scs, N),
     N >= 1.
 
-conquista(Scrobbles, UsuarioEmail, "10 músicas ouvidas") :-
+conquista(Scrobbles, UsuarioEmail, "10 músicas ouvidas!") :-
     include(scrobble_do_usuario(UsuarioEmail), Scrobbles, Scs),
     length(Scs, N),
     N >= 10.
 
-conquista(Scrobbles, UsuarioEmail, "100 minutos escutados") :-
+conquista(Scrobbles, UsuarioEmail, "100 minutos escutados!") :-
     include(scrobble_do_usuario(UsuarioEmail), Scrobbles, Scs),
     findall(D,
         (member(S, Scs), get_dict(musica, S, Musica), get_dict(duracao, Musica, D)),
@@ -48,7 +48,7 @@ conquista(Scrobbles, UsuarioEmail, Conquista) :-
     contar_ocorrencias(Generos, Contagens),
     member((GeneroMais, N), Contagens),
     N >= 10,
-    string_concat("Viciado em ", GeneroMais, Conquista).
+    string_concat("Viciado(a) em ", GeneroMais, Conquista).
 
 most_common([], none).
 most_common(Lista, ElementoMaisFrequente) :-

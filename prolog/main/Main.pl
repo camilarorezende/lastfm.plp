@@ -1,3 +1,5 @@
+﻿:- set_prolog_flag(encoding, utf8).
+
 :- use_module('../Funcionalidades/Funcionalidades').
 :- use_module(library(strings)).
 :- initialization(run).
@@ -96,7 +98,7 @@ menu_usuario_opcao("2", Usuario) :-
 menu_usuario_opcao("3", Usuario) :-
     carregar_musicas(Ms),
     ( Ms == [] ->
-        writeln('Nenhuma música disponível no catálogo.'),
+        writeln('\nNenhuma música disponível no catálogo.'),
         menu_usuario_logado(Usuario)
     ;   writeln('\nEscolha uma música para scrobble:'),
         listar_musicas(Ms, 1),

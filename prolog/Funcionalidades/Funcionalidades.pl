@@ -360,7 +360,7 @@ imprime_rank_global(R) :- imprime_rank_global(R, 1).
 verificar_compatibilidade(U1, U2) :-
     verificar_compatibilidade(U1, U2, C),
     P is C * 100,
-    format('\nCompatibilidade entre ~w e ~w: ~2f%%~n', [U1.nome, U2.nome, P]),
+    format('\nCompatibilidade entre ~w e ~w: ~2f%~n', [U1.nome, U2.nome, P]),
     ( P < 50  -> writeln('\nXiii... vocês têm gostos bem diferentes! Talvez devam encontrar algo em comum. :v')
     ; P >= 80  -> writeln('\nWow!!! Que match hein?! Perfeito para montarem uma playlist :D')
     ; writeln('\nNada mau!! Que tal fortalecerem esse laço?! ;)')
